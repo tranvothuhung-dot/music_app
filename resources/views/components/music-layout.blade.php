@@ -37,7 +37,7 @@
 
         .banner-wrapper {
             max-width: 1000px;
-            margin: 0 auto;
+            margin: 24px auto 0;
             padding: 0 15px;
         }
 
@@ -52,11 +52,11 @@
         }
 
         .navbar {
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
-            padding: 18px 0;
-            min-height: 80px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            padding: 14px 0;
+            min-height: 72px;
         }
 
         .navbar-toggler {
@@ -66,25 +66,25 @@
 
         .navbar-brand {
             font-weight: 800;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: var(--primary-color) !important;
-            margin-right: 25px;
+            margin-right: 22px;
             letter-spacing: -0.02em;
         }
 
         .navbar-nav .nav-link {
-            color: #555 !important;
+            color: #444 !important;
+            font-size: 0.98rem;
             font-weight: 600;
-            padding: 10px 18px !important;
-            border-radius: 50px;
-            margin: 0 8px;
-            transition: all 0.3s;
+            padding: 10px 16px !important;
+            border-radius: 999px;
+            margin: 0 6px;
+            transition: all 0.25s ease;
         }
 
         .navbar-nav .nav-link:hover {
             background-color: #fff0f5;
             color: var(--primary-color) !important;
-            transform: translateY(-1px);
         }
 
         .navbar-nav .nav-link.active {

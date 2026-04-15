@@ -22,12 +22,5 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-
-        DB::table('danh_muc_am_nhac')->insert([
-            ['ten_danh_muc' => 'Pop', 'created_at' => now(), 'updated_at' => now()],
-            ['ten_danh_muc' => 'Rock', 'created_at' => now(), 'updated_at' => now()],
-            ['ten_danh_muc' => 'Nhạc Trữ Tình', 'created_at' => now(), 'updated_at' => now()],
-            ['ten_danh_muc' => 'EDM', 'created_at' => now(), 'updated_at' => now()],
-        ]);
     }
 }
