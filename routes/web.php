@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,11 +21,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
 
-        Route::view('/users', 'admin.placeholder', [
-            'title' => 'Người Dùng - Admin',
-            'heading' => 'Người Dùng',
-            'description' => 'Trang quản lý người dùng sẽ được hiển thị ở đây.',
-        ])->name('users.index');
+        Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+        Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+        Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 
         Route::view('/artists', 'admin.placeholder', [
             'title' => 'Nghệ Sĩ - Admin',
