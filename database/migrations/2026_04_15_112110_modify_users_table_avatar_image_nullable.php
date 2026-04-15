@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('danh_muc_am_nhac')) {
-            Schema::create('danh_muc_am_nhac', function (Blueprint $table) {
-                $table->id();
-                $table->string('ten_danh_muc');
-                $table->timestamps();
-            });
-        }
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('avatar_image', 255)->nullable()->change();
+        });
     }
 
     /**
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('danh_muc_am_nhac');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('avatar_image', 255)->nullable(false)->change();
+        });
     }
 };

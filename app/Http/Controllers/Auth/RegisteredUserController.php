@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -37,9 +38,11 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'full_name' => $request->name,
+            'username' => $this->generateUsername($request->name),
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'gender' => 'other', // default gender
         ]);
 
         event(new Registered($user));
@@ -47,5 +50,22 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
+    }
+
+    /**
+     * Generate a unique username from name.
+     */
+    private function generateUsername(string $name): string
+    {
+        $baseUsername = Str::slug($name, '');
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
     }
 }
