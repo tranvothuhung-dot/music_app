@@ -3,13 +3,87 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
 {
+    private function dashboardSharedData(): array
+    {
+        $userId = Auth::id();
+
+        if (! $userId) {
+            return [
+                'count_liked' => 0,
+                'my_playlists' => collect(),
+                'history_list' => collect(),
+                'liked_songs' => collect(),
+                'queue_songs' => collect(),
+                'js_data' => [
+                    'queue' => collect(),
+                ],
+            ];
+        }
+
+        $count_liked = DB::table('favorites')
+            ->where('user_id', $userId)
+            ->count();
+
+        $my_playlists = DB::table('playlists')
+            ->where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $history_list = DB::table('listening_history')
+            ->join('songs', 'listening_history.song_id', '=', 'songs.song_id')
+            ->join('artists', 'songs.artist_id', '=', 'artists.artist_id')
+            ->where('listening_history.user_id', $userId)
+            ->select('songs.*', 'artists.artist_name', 'listening_history.listened_at')
+            ->orderByDesc('listening_history.listened_at')
+            ->limit(10)
+            ->get();
+
+        $liked_songs = DB::table('favorites')
+            ->join('songs', 'favorites.song_id', '=', 'songs.song_id')
+            ->join('artists', 'songs.artist_id', '=', 'artists.artist_id')
+            ->where('favorites.user_id', $userId)
+            ->select('songs.*', 'artists.artist_name', 'favorites.added_at')
+            ->orderByDesc('favorites.added_at')
+            ->limit(10)
+            ->get();
+
+        $popular_songs = DB::table('songs')
+            ->join('artists', 'songs.artist_id', '=', 'artists.artist_id')
+            ->select('songs.*', 'artists.artist_name')
+            ->orderByDesc('songs.view_count')
+            ->limit(20)
+            ->get();
+
+        $queue_songs = $popular_songs
+            ->concat($liked_songs)
+            ->concat($history_list)
+            ->unique('song_id')
+            ->values();
+
+        return [
+            'count_liked' => $count_liked,
+            'my_playlists' => $my_playlists,
+            'history_list' => $history_list,
+            'liked_songs' => $liked_songs,
+            'queue_songs' => $queue_songs,
+            'js_data' => [
+                'queue' => $queue_songs,
+            ],
+        ];
+    }
+
     public function index()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
         $trending = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
             ->select('s.*', 'a.artist_name')
@@ -80,30 +154,47 @@ class HomeController extends Controller
             ->select('s.*', 'a.artist_name')
             ->paginate(20);
 
-        return view('music.songs', [
+        return view('music.songs', array_merge([
             'songs' => $songs,
-        ]);
+        ], $this->dashboardSharedData()));
     }
 
-    public function albums()
+    public function albums(Request $request)
     {
-        $albums = DB::table('albums as al')
+        $albumId = (int) $request->query('album_id', 0);
+
+        $albumsQuery = DB::table('albums as al')
             ->join('artists as a', 'al.artist_id', '=', 'a.artist_id')
-            ->select('al.*', 'a.artist_name')
-            ->paginate(20);
+            ->select('al.*', 'a.artist_name');
 
-        return view('music.albums', [
+        if ($albumId > 0) {
+            $albumsQuery->where('al.album_id', $albumId);
+        }
+
+        $albums = $albumsQuery->paginate(20)->withQueryString();
+
+        return view('music.albums', array_merge([
             'albums' => $albums,
-        ]);
+            'selected_album_id' => $albumId,
+        ], $this->dashboardSharedData()));
     }
 
-    public function artists()
+    public function artists(Request $request)
     {
-        $artists = DB::table('artists')->paginate(20);
+        $artistId = (int) $request->query('artist_id', 0);
 
-        return view('music.artists', [
+        $artistsQuery = DB::table('artists');
+
+        if ($artistId > 0) {
+            $artistsQuery->where('artist_id', $artistId);
+        }
+
+        $artists = $artistsQuery->paginate(20)->withQueryString();
+
+        return view('music.artists', array_merge([
             'artists' => $artists,
-        ]);
+            'selected_artist_id' => $artistId,
+        ], $this->dashboardSharedData()));
     }
 
 
@@ -117,9 +208,9 @@ class HomeController extends Controller
                 ->get();
         }
 
-        return view('music.news', [
+        return view('music.news', array_merge([
             'news' => $news,
-        ]);
+        ], $this->dashboardSharedData()));
     }
 
     public function search(Request $request)
