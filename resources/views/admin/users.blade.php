@@ -84,20 +84,6 @@
                 white-space: nowrap;
             }
 
-            .clear-filter {
-                margin-left: 8px;
-                border-radius: 10px;
-                border: 1px solid #d9deea;
-                background: #fff;
-                color: #4a5565;
-                font-size: 13px;
-                font-weight: 600;
-                padding: 10px 12px;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-            }
-
             .btn {
                 border: 0;
                 border-radius: 10px;
@@ -400,8 +386,7 @@
 
                 .search-input,
                 .search-button,
-                .add-button,
-                .clear-filter {
+                .add-button {
                     width: 100%;
                 }
 
@@ -412,12 +397,6 @@
 
                 .search-button {
                     border-radius: 10px;
-                    margin-bottom: 8px;
-                }
-
-                .clear-filter {
-                    margin-left: 0;
-                    justify-content: center;
                     margin-bottom: 8px;
                 }
 
@@ -441,9 +420,6 @@
                         <span>🔍</span>
                         <span>Tìm kiếm</span>
                     </button>
-                    @if($search)
-                        <a href="{{ route('admin.users.index') }}" class="clear-filter">Xóa lọc</a>
-                    @endif
                 </form>
                 <button type="button" class="add-button" id="openCreateUserModal">+ Thêm Người Dùng</button>
             </div>
@@ -472,8 +448,8 @@
             <table>
                 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>ẢNH</th>
-                    <th>MÃ NGƯỜI DÙNG</th>
                     <th>TÊN ĐĂNG NHẬP</th>
                     <th>EMAIL</th>
                     <th>NGÀY SINH</th>
@@ -495,6 +471,7 @@
                         $roleLabel = (int) $user->role_id === 1 ? 'Admin' : 'User';
                     @endphp
                     <tr>
+                        <td class="cell-text">#{{ $user->user_id }}</td>
                         <td>
                             @if($preview)
                                 <img src="{{ $preview }}" alt="Ảnh đại diện" class="thumb">
@@ -502,7 +479,6 @@
                                 <span class="text-muted">Không có ảnh</span>
                             @endif
                         </td>
-                        <td class="cell-text">{{ $user->user_id }}</td>
                         <td class="cell-text">{{ $user->username }}</td>
                         <td class="cell-text">{{ $user->email }}</td>
                         <td class="cell-text">{{ $user->birth_day ? date('d/m/Y', strtotime($user->birth_day)) : '-' }}</td>

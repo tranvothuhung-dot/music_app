@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\ArtistController;
+use App\Http\Controllers\Admin\AlbumsController;
+use App\Http\Controllers\Admin\GenresController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProfileController;
@@ -32,17 +34,15 @@ Route::middleware('auth')->group(function () {
         Route::put('/artists/{artist}', [ArtistController::class, 'update'])->name('artists.update');
         Route::delete('/artists/{artist}', [ArtistController::class, 'destroy'])->name('artists.destroy');
 
-        Route::view('/albums', 'admin.placeholder', [
-            'title' => 'Albums - Admin',
-            'heading' => 'Albums',
-            'description' => 'Trang quản lý albums sẽ được hiển thị ở đây.',
-        ])->name('albums.index');
+        Route::get('/albums', [AlbumsController::class, 'index'])->name('albums.index');
+        Route::post('/albums', [AlbumsController::class, 'store'])->name('albums.store');
+        Route::put('/albums/{album}', [AlbumsController::class, 'update'])->name('albums.update');
+        Route::delete('/albums/{album}', [AlbumsController::class, 'destroy'])->name('albums.destroy');
 
-        Route::view('/genres', 'admin.placeholder', [
-            'title' => 'Thể Loại - Admin',
-            'heading' => 'Thể Loại',
-            'description' => 'Trang quản lý thể loại sẽ được hiển thị ở đây.',
-        ])->name('genres.index');
+        Route::get('/genres', [GenresController::class, 'index'])->name('genres.index');
+        Route::post('/genres', [GenresController::class, 'store'])->name('genres.store');
+        Route::put('/genres/{genre}', [GenresController::class, 'update'])->name('genres.update');
+        Route::delete('/genres/{genre}', [GenresController::class, 'destroy'])->name('genres.destroy');
 
         Route::view('/songs', 'admin.placeholder', [
             'title' => 'Bài Hát - Admin',
