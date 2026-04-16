@@ -10,6 +10,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $hasArtistStatus = Schema::hasColumn('artists', 'status');
+
         $trending = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
             ->select('s.*', 'a.artist_name')
@@ -32,6 +34,9 @@ class HomeController extends Controller
             ->get();
 
         $featuredArtists = DB::table('artists')
+            ->when($hasArtistStatus, function ($query) {
+                $query->where('status', 1);
+            })
             ->orderByDesc('created_at')
             ->limit(8)
             ->get();
@@ -99,7 +104,11 @@ class HomeController extends Controller
 
     public function artists()
     {
-        $artists = DB::table('artists')->paginate(20);
+        $artists = DB::table('artists')
+            ->when(Schema::hasColumn('artists', 'status'), function ($query) {
+                $query->where('status', 1);
+            })
+            ->paginate(20);
 
         return view('music.artists', [
             'artists' => $artists,
@@ -142,6 +151,9 @@ class HomeController extends Controller
 
             $artists = DB::table('artists')
                 ->where('artist_name', 'like', $searchTerm)
+                ->when(Schema::hasColumn('artists', 'status'), function ($query) {
+                    $query->where('status', 1);
+                })
                 ->limit(10)
                 ->get();
 
