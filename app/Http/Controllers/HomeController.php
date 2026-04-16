@@ -17,6 +17,7 @@ class HomeController extends Controller
             return [
                 'count_liked' => 0,
                 'my_playlists' => collect(),
+                'playlist_songs_map' => collect(),
                 'history_list' => collect(),
                 'liked_songs' => collect(),
                 'queue_songs' => collect(),
@@ -34,6 +35,16 @@ class HomeController extends Controller
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get();
+
+        $playlist_songs_map = DB::table('playlist_songs as ps')
+            ->join('playlists as p', 'ps.playlist_id', '=', 'p.playlist_id')
+            ->join('songs as s', 'ps.song_id', '=', 's.song_id')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->where('p.user_id', $userId)
+            ->select('ps.playlist_id', 's.song_id', 's.song_name', 'a.artist_name', 'ps.added_at')
+            ->orderByDesc('ps.added_at')
+            ->get()
+            ->groupBy('playlist_id');
 
         $history_list = DB::table('listening_history')
             ->join('songs', 'listening_history.song_id', '=', 'songs.song_id')
@@ -69,6 +80,7 @@ class HomeController extends Controller
         return [
             'count_liked' => $count_liked,
             'my_playlists' => $my_playlists,
+            'playlist_songs_map' => $playlist_songs_map,
             'history_list' => $history_list,
             'liked_songs' => $liked_songs,
             'queue_songs' => $queue_songs,
@@ -164,6 +176,29 @@ class HomeController extends Controller
         $albumId = (int) $request->query('album_id', 0);
         $artistId = (int) $request->query('artist_id', 0);
 
+        $selectedAlbum = null;
+        $artistSongs = collect();
+
+        if ($albumId > 0) {
+            $selectedAlbum = DB::table('albums as al')
+                ->join('artists as a', 'al.artist_id', '=', 'a.artist_id')
+                ->select('al.*', 'a.artist_name')
+                ->where('al.album_id', $albumId)
+                ->first();
+
+            if ($selectedAlbum) {
+                $artistId = (int) $selectedAlbum->artist_id;
+
+                $artistSongs = DB::table('songs as s')
+                    ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+                    ->select('s.*', 'a.artist_name')
+                    ->where('s.artist_id', $artistId)
+                    ->orderByDesc('s.view_count')
+                    ->orderBy('s.song_name')
+                    ->get();
+            }
+        }
+
         $albumsQuery = DB::table('albums as al')
             ->join('artists as a', 'al.artist_id', '=', 'a.artist_id')
             ->select('al.*', 'a.artist_name');
@@ -182,12 +217,33 @@ class HomeController extends Controller
             'albums' => $albums,
             'selected_album_id' => $albumId,
             'selected_artist_id' => $artistId,
+            'selected_album' => $selectedAlbum,
+            'artist_songs' => $artistSongs,
         ], $this->dashboardSharedData()));
     }
 
     public function artists(Request $request)
     {
         $artistId = (int) $request->query('artist_id', 0);
+
+        $selectedArtist = null;
+        $artistSongs = collect();
+
+        if ($artistId > 0) {
+            $selectedArtist = DB::table('artists')
+                ->where('artist_id', $artistId)
+                ->first();
+
+            if ($selectedArtist) {
+                $artistSongs = DB::table('songs as s')
+                    ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+                    ->select('s.*', 'a.artist_name')
+                    ->where('s.artist_id', $artistId)
+                    ->orderByDesc('s.view_count')
+                    ->orderBy('s.song_name')
+                    ->get();
+            }
+        }
 
         $artistsQuery = DB::table('artists');
 
@@ -200,6 +256,43 @@ class HomeController extends Controller
         return view('music.artists', array_merge([
             'artists' => $artists,
             'selected_artist_id' => $artistId,
+            'selected_artist' => $selectedArtist,
+            'artist_songs' => $artistSongs,
+        ], $this->dashboardSharedData()));
+    }
+
+    public function genres(Request $request)
+    {
+        $genreId = (int) $request->query('genre_id', 0);
+
+        $genres = DB::table('genres')
+            ->orderBy('genre_name')
+            ->get();
+
+        $selectedGenre = null;
+        $genreSongs = collect();
+
+        if ($genreId > 0) {
+            $selectedGenre = DB::table('genres')
+                ->where('genre_id', $genreId)
+                ->first();
+
+            if ($selectedGenre) {
+                $genreSongs = DB::table('songs as s')
+                    ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+                    ->select('s.*', 'a.artist_name')
+                    ->where('s.genre_id', $genreId)
+                    ->orderByDesc('s.view_count')
+                    ->orderBy('s.song_name')
+                    ->get();
+            }
+        }
+
+        return view('music.genres', array_merge([
+            'genres' => $genres,
+            'selected_genre_id' => $genreId,
+            'selected_genre' => $selectedGenre,
+            'genre_songs' => $genreSongs,
         ], $this->dashboardSharedData()));
     }
 
@@ -216,6 +309,31 @@ class HomeController extends Controller
 
         return view('music.news', array_merge([
             'news' => $news,
+            'selected_news' => null,
+        ], $this->dashboardSharedData()));
+    }
+
+    public function newsDetail(int $newsId)
+    {
+        if (!Schema::hasTable('news')) {
+            abort(404);
+        }
+
+        $news = DB::table('news')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $selectedNews = DB::table('news')
+            ->where('news_id', $newsId)
+            ->first();
+
+        if (!$selectedNews) {
+            abort(404);
+        }
+
+        return view('music.news', array_merge([
+            'news' => $news,
+            'selected_news' => $selectedNews,
         ], $this->dashboardSharedData()));
     }
 

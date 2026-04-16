@@ -8,6 +8,144 @@ use Illuminate\Support\Facades\Auth;
 
 class Controller3 extends Controller
 {
+    public function removeSongFromPlaylist(Request $request)
+    {
+        $userId = Auth::id();
+        $playlistId = (int) $request->input('playlist_id');
+        $songId = (int) $request->input('song_id');
+
+        if (! $playlistId || ! $songId) {
+            return response()->json([
+                'message' => 'Dữ liệu không hợp lệ.',
+            ], 422);
+        }
+
+        $playlistExists = DB::table('playlists')
+            ->where('playlist_id', $playlistId)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if (! $playlistExists) {
+            return response()->json([
+                'message' => 'Không tìm thấy playlist.',
+            ], 404);
+        }
+
+        $deleted = DB::table('playlist_songs')
+            ->where('playlist_id', $playlistId)
+            ->where('song_id', $songId)
+            ->delete();
+
+        return response()->json([
+            'deleted' => $deleted > 0,
+        ]);
+    }
+
+    public function addSongToPlaylist(Request $request)
+    {
+        $userId = Auth::id();
+        $songId = (int) $request->input('song_id');
+        $playlistId = (int) $request->input('playlist_id', 0);
+        $playlistName = trim((string) $request->input('playlist_name', ''));
+
+        if (! $songId || ! DB::table('songs')->where('song_id', $songId)->exists()) {
+            return response()->json([
+                'message' => 'Bài hát không tồn tại.',
+            ], 422);
+        }
+
+        $playlist = null;
+        $createdPlaylist = false;
+
+        if ($playlistId > 0) {
+            $playlist = DB::table('playlists')
+                ->where('playlist_id', $playlistId)
+                ->where('user_id', $userId)
+                ->first();
+        }
+
+        if (! $playlist && $playlistName !== '') {
+            $playlist = DB::table('playlists')
+                ->where('user_id', $userId)
+                ->whereRaw('LOWER(playlist_name) = ?', [mb_strtolower($playlistName)])
+                ->first();
+
+            if (! $playlist) {
+                $newPlaylistId = DB::table('playlists')->insertGetId([
+                    'user_id' => $userId,
+                    'playlist_name' => $playlistName,
+                    'created_at' => now(),
+                ], 'playlist_id');
+
+                $playlist = (object) [
+                    'playlist_id' => $newPlaylistId,
+                    'playlist_name' => $playlistName,
+                ];
+                $createdPlaylist = true;
+            }
+        }
+
+        if (! $playlist) {
+            return response()->json([
+                'message' => 'Playlist không hợp lệ.',
+            ], 422);
+        }
+
+        $exists = DB::table('playlist_songs')
+            ->where('playlist_id', $playlist->playlist_id)
+            ->where('song_id', $songId)
+            ->exists();
+
+        if (! $exists) {
+            DB::table('playlist_songs')->insert([
+                'playlist_id' => $playlist->playlist_id,
+                'song_id' => $songId,
+                'added_at' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'added' => ! $exists,
+            'created_playlist' => $createdPlaylist,
+            'playlist' => [
+                'playlist_id' => (int) $playlist->playlist_id,
+                'playlist_name' => (string) $playlist->playlist_name,
+            ],
+        ]);
+    }
+
+    public function createPlaylist(Request $request)
+    {
+        $userId = Auth::id();
+        $playlistName = trim((string) $request->input('playlist_name', ''));
+
+        if ($playlistName === '') {
+            return response()->json([
+                'message' => 'Tên playlist không được để trống.',
+            ], 422);
+        }
+
+        if (mb_strlen($playlistName) > 120) {
+            return response()->json([
+                'message' => 'Tên playlist quá dài.',
+            ], 422);
+        }
+
+        $playlistId = DB::table('playlists')->insertGetId([
+            'user_id' => $userId,
+            'playlist_name' => $playlistName,
+            'created_at' => now(),
+        ], 'playlist_id');
+
+        return response()->json([
+            'created' => true,
+            'playlist' => [
+                'playlist_id' => $playlistId,
+                'playlist_name' => $playlistName,
+            ],
+        ]);
+    }
+
     public function deletePlaylist(Request $request)
     {
         $userId = Auth::id();
@@ -143,6 +281,16 @@ class Controller3 extends Controller
             ->where('user_id', $user_id)
             ->orderByDesc('created_at')
             ->get();
+
+        $playlist_songs_map = DB::table('playlist_songs as ps')
+            ->join('playlists as p', 'ps.playlist_id', '=', 'p.playlist_id')
+            ->join('songs as s', 'ps.song_id', '=', 's.song_id')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->where('p.user_id', $user_id)
+            ->select('ps.playlist_id', 's.song_id', 's.song_name', 'a.artist_name', 'ps.added_at')
+            ->orderByDesc('ps.added_at')
+            ->get()
+            ->groupBy('playlist_id');
             
         $history_list = DB::table('listening_history')
             ->join('songs', 'listening_history.song_id', '=', 'songs.song_id')
@@ -179,7 +327,7 @@ class Controller3 extends Controller
         // Trả về view 'music.home' nằm trong resources/views/music/home.blade.php
         return view('music.home', compact(
             'trending', 'newest_songs', 'albums', 'artists_list', 
-            'news_list', 'count_liked', 'my_playlists', 'history_list', 'liked_songs', 'queue_songs', 'js_data'
+            'news_list', 'count_liked', 'my_playlists', 'playlist_songs_map', 'history_list', 'liked_songs', 'queue_songs', 'js_data'
         ));
     }
 }

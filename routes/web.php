@@ -20,10 +20,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/bai-hat', [HomeController::class, 'songs'])->name('dashboard.songs');
     Route::get('/dashboard/album', [HomeController::class, 'albums'])->name('dashboard.albums');
     Route::get('/dashboard/nghe-si', [HomeController::class, 'artists'])->name('dashboard.artists');
+    Route::get('/dashboard/the-loai', [HomeController::class, 'genres'])->name('dashboard.genres');
     Route::get('/dashboard/tin-tuc', [HomeController::class, 'news'])->name('dashboard.news');
+    Route::get('/dashboard/tin-tuc/{newsId}', [HomeController::class, 'newsDetail'])->name('dashboard.news.detail');
     Route::post('/dashboard/favorites/toggle', [\App\Http\Controllers\Controller3::class, 'toggleFavorite'])->name('dashboard.favorites.toggle');
     Route::post('/dashboard/history/add', [\App\Http\Controllers\Controller3::class, 'addToHistory'])->name('dashboard.history.add');
+    Route::post('/dashboard/playlists/create', [\App\Http\Controllers\Controller3::class, 'createPlaylist'])->name('dashboard.playlists.create');
     Route::post('/dashboard/playlists/delete', [\App\Http\Controllers\Controller3::class, 'deletePlaylist'])->name('dashboard.playlists.delete');
+    Route::post('/dashboard/playlists/add-song', [\App\Http\Controllers\Controller3::class, 'addSongToPlaylist'])->name('dashboard.playlists.addSong');
+    Route::post('/dashboard/playlists/remove-song', [\App\Http\Controllers\Controller3::class, 'removeSongFromPlaylist'])->name('dashboard.playlists.removeSong');
 });
 
 require __DIR__.'/auth.php';

@@ -13,7 +13,16 @@
         body { padding-bottom: 150px !important; }
         
         /* Layout & Card */
-        .sidebar-sticky { position: sticky; top: 90px; height: calc(100vh - 110px); overflow-y: auto; border-right: 1px solid #eee; padding-right: 15px;}
+        .sidebar-sticky {
+            position: sticky;
+            top: 90px;
+            height: calc(100vh - 90px - 130px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            border-right: 1px solid #eee;
+            padding-right: 15px;
+            padding-bottom: 12px;
+        }
         .section-title { font-weight: 700; border-left: 5px solid var(--primary-color); padding-left: 15px; margin-bottom: 25px; }
         .custom-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); height: 100%; transition: all 0.3s; }
         .custom-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
@@ -287,6 +296,19 @@
             box-shadow: 0 4px 10px rgba(17, 24, 39, 0.1);
         }
 
+        .queue-song .dropdown {
+            position: relative;
+            z-index: 2;
+        }
+
+        .queue-song .dropdown-menu {
+            z-index: 3500;
+        }
+
+        .queue-song .btn-song-menu::after {
+            display: none !important;
+        }
+
         .queue-song .fw-semibold {
             color: #111827;
         }
@@ -434,9 +456,9 @@
 
         .playlist-chip-menu-btn {
             position: absolute;
-            top: 50%;
+            top: 12px;
             right: 10px;
-            transform: translateY(-50%);
+            transform: none;
             border: 0;
             width: 28px;
             height: 28px;
@@ -452,6 +474,11 @@
         .playlist-chip-menu-btn:hover {
             background: rgba(255, 255, 255, 0.22);
             color: #fff;
+        }
+
+        .playlist-chip-menu-btn::after,
+        .playlist-song-menu-btn::after {
+            display: none !important;
         }
 
         .playlist-dropdown {
@@ -471,6 +498,105 @@
         .playlist-dropdown .dropdown-item:hover {
             background: #fff1f2;
             color: #dc2626;
+        }
+
+        .playlist-song-list {
+            margin-top: 8px;
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+
+        .playlist-chip-wrap.is-collapsed .playlist-song-list {
+            display: none;
+        }
+
+        .playlist-song-wrap {
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .playlist-song-item {
+            width: 100%;
+            border: 0;
+            background: #eef1f5;
+            color: #4b5563;
+            border-radius: 10px;
+            text-align: left;
+            padding: 7px 38px 7px 10px;
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        .playlist-song-item.active-song {
+            background: linear-gradient(135deg, #ff4081 0%, #ff80ab 100%);
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(255, 64, 129, 0.22);
+        }
+
+        .playlist-song-item.active-song .playlist-song-name,
+        .playlist-song-item.active-song .playlist-song-artist {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .playlist-song-wrap.active-song .playlist-song-menu-btn {
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .playlist-song-wrap.active-song .playlist-song-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.26);
+            color: #fff;
+        }
+
+        .playlist-song-menu-btn {
+            position: absolute;
+            top: 50%;
+            right: 7px;
+            transform: translateY(-50%);
+            border: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            background: transparent;
+            color: #9aa2af;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .playlist-song-menu-btn:hover {
+            background: rgba(17, 24, 39, 0.08);
+            color: #4b5563;
+        }
+
+        .playlist-song-dropdown {
+            min-width: 170px;
+            border: 0;
+            border-radius: 10px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+            padding: 6px;
+        }
+
+        .playlist-song-dropdown .dropdown-item {
+            border-radius: 8px;
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        .playlist-song-dropdown .dropdown-item:hover {
+            background: #fff1f2;
+            color: #dc2626;
+        }
+
+        .playlist-song-item .playlist-song-name {
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .playlist-song-item .playlist-song-artist {
+            color: #6b7280;
+            font-size: 0.83rem;
+            margin-top: 2px;
         }
 
         .action-toast {
@@ -544,6 +670,13 @@
             border-top: 1px solid #eee;
             z-index: 1050;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .player-bar.is-hidden {
+            transform: translateY(115%);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .song-card {
@@ -623,9 +756,42 @@
             background: #e83274;
         }
 
-        .player-progress,
         .player-volume {
             accent-color: var(--primary-color);
+        }
+
+        .player-seekbar {
+            position: relative;
+            height: 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            cursor: pointer;
+            flex-grow: 1;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .player-seek-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ff3f86 0%, #ff6fa8 100%);
+        }
+
+        .player-seek-handle {
+            position: absolute;
+            top: 50%;
+            right: -6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #ff3f86;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
         }
 
         @media (max-width: 991.98px) {
@@ -743,19 +909,91 @@
             gap: 12px;
         }
 
-        .top-nav-user {
+        .user-menu-toggle {
+            border: 2px solid #1f2937;
+            border-radius: 8px;
+            background: #fff;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 10px 3px 4px;
+            line-height: 1;
             font-weight: 700;
-            color: #1f2937;
-            max-width: 180px;
+            max-width: 200px;
+        }
+
+        .user-menu-toggle::after {
+            color: #2563eb;
+            margin-left: 2px;
+        }
+
+        .user-menu-toggle:hover,
+        .user-menu-toggle:focus,
+        .user-menu-toggle:active {
+            border-color: #111827 !important;
+            background: #fff !important;
+            color: #111827 !important;
+        }
+
+        .user-menu-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #d1d5db;
+            flex-shrink: 0;
+        }
+
+        .user-menu-name {
+            max-width: 132px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #ff3f86;
+            font-size: 0.98rem;
         }
 
-        .btn-logout {
-            border-radius: 999px;
-            padding: 8px 18px;
+        .user-menu-dropdown {
+            border: 0;
+            border-radius: 12px;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.2);
+            min-width: 170px;
+            padding: 8px;
+        }
+
+        .user-menu-item {
+            border: 0;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            padding: 9px 10px;
+            color: #374151;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .user-menu-item.logout {
+            color: #ef4444;
+            font-weight: 800;
+        }
+
+        .user-menu-item.logout:hover {
+            background: #fff1f2;
+            color: #dc2626;
+        }
+
+        .user-menu-form {
+            margin: 0;
         }
 
         @media (max-width: 991.98px) {
@@ -781,9 +1019,9 @@
                 max-width: 100%;
             }
 
-            .top-nav-user {
-                max-width: 120px;
-                font-size: 0.92rem;
+            .user-menu-name {
+                max-width: 100px;
+                font-size: 0.9rem;
             }
         }
 
@@ -892,6 +1130,62 @@
             text-align: center;
         }
 
+        .playlist-modal .modal-content {
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28);
+        }
+
+        .playlist-modal .modal-header {
+            border-bottom: 0;
+            padding: 16px 18px 8px;
+        }
+
+        .playlist-modal .modal-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .playlist-modal .btn-close {
+            box-shadow: none;
+        }
+
+        .playlist-modal .modal-body {
+            padding: 4px 18px 18px;
+        }
+
+        .playlist-modal-label {
+            font-weight: 700;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+
+        .playlist-modal .form-select,
+        .playlist-modal .form-control {
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            height: 40px;
+            box-shadow: none;
+        }
+
+        .playlist-modal .form-select:focus,
+        .playlist-modal .form-control:focus {
+            border-color: #ff3f86;
+            box-shadow: 0 0 0 3px rgba(255, 63, 134, 0.16);
+        }
+
+        .playlist-modal-save {
+            margin-top: 14px;
+            width: 100%;
+            border: 0;
+            border-radius: 999px;
+            height: 42px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #ff3f86 0%, #ff5f9a 100%);
+        }
+
         @media (max-width: 991.98px) {
             .site-footer {
                 padding-bottom: 150px;
@@ -913,7 +1207,7 @@
                 <a href="{{ route('dashboard.songs') }}" class="top-menu-link {{ request()->routeIs('dashboard.songs') ? 'active' : '' }}">Bài hát</a>
                 <a href="{{ route('dashboard.albums') }}" class="top-menu-link {{ request()->routeIs('dashboard.albums') ? 'active' : '' }}">Album</a>
                 <a href="{{ route('dashboard.artists') }}" class="top-menu-link {{ request()->routeIs('dashboard.artists') ? 'active' : '' }}">Nghệ sĩ</a>
-                <a href="{{ route('music.index') }}" class="top-menu-link {{ request()->routeIs('music.index') ? 'active' : '' }}">Thể loại</a>
+                <a href="{{ route('dashboard.genres') }}" class="top-menu-link {{ request()->routeIs('dashboard.genres') ? 'active' : '' }}">Thể loại</a>
                 <a href="{{ route('dashboard.news') }}" class="top-menu-link {{ request()->routeIs('dashboard.news') ? 'active' : '' }}">Tin tức</a>
             </div>
             <form method="POST" action="{{ route('music.search') }}" class="top-search-form">
@@ -930,11 +1224,39 @@
                 </div>
             </form>
             <div class="top-nav-actions">
-                <span class="top-nav-user d-none d-xl-inline">{{ Auth::user()->full_name ?? Auth::user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm btn-logout">Đăng xuất</button>
-                </form>
+                <div class="dropdown">
+                    @php
+                        $displayName = Auth::user()->full_name ?? Auth::user()->name;
+                        $avatarImage = Auth::user()->avatar_image ?? '';
+                        $avatarSrc = $avatarImage
+                            ? (str_starts_with($avatarImage, 'http://') || str_starts_with($avatarImage, 'https://') ? $avatarImage : asset('images/'.$avatarImage))
+                            : 'https://ui-avatars.com/api/?background=ffffff&color=111827&name='.urlencode($displayName);
+                    @endphp
+                    <button class="btn dropdown-toggle user-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ $avatarSrc }}" alt="{{ $displayName }}" class="user-menu-avatar" onerror="this.src='https://ui-avatars.com/api/?background=ffffff&color=111827&name={{ urlencode($displayName) }}'">
+                        <span class="user-menu-name">{{ $displayName }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end user-menu-dropdown">
+                        <li>
+                            <a href="{{ route('profile.edit') }}" class="user-menu-item">
+                                <i class="fas fa-user-circle text-secondary"></i>Hồ sơ
+                            </a>
+                        </li>
+                        <li>
+                            <button type="button" class="user-menu-item" data-open-liked>
+                                <i class="fas fa-heart text-danger"></i>Yêu thích
+                            </button>
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" class="user-menu-form">
+                                @csrf
+                                <button type="submit" class="user-menu-item logout">
+                                    <i class="fas fa-right-from-bracket"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -946,17 +1268,20 @@
                     <div class="sidebar-shell">
                         <div class="library-head">
                             <h5 class="m-0 fw-bold text-secondary"><i class="fas fa-book-open me-2"></i>My Library</h5>
-                            <button type="button" class="library-plus-btn" title="Tạo playlist mới">
+                            <button type="button" class="library-plus-btn" title="Dùng menu bài hát để thêm vào playlist">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
 
-                        <button type="button" class="library-card" data-bs-toggle="collapse" data-bs-target="#likedSongsCollapse" aria-expanded="false" aria-controls="likedSongsCollapse">
-                            <span class="library-card-icon"><i class="fas fa-heart"></i></span>
-                            <span class="library-card-text">
-                                <span class="library-card-title">Liked Songs</span>
-                                <span id="liked-songs-count" class="library-card-sub">{{ $count_liked }} bài hát</span>
+                        <button type="button" class="library-card library-toggle" data-bs-toggle="collapse" data-bs-target="#likedSongsCollapse" aria-expanded="false" aria-controls="likedSongsCollapse">
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="library-card-icon"><i class="fas fa-heart"></i></span>
+                                <span class="library-card-text">
+                                    <span class="library-card-title">Liked Songs</span>
+                                    <span id="liked-songs-count" class="library-card-sub">{{ $count_liked }} bài hát</span>
+                                </span>
                             </span>
+                            <span class="library-card-right"><i class="fas fa-chevron-down"></i></span>
                         </button>
                         <div class="collapse library-collapse" id="likedSongsCollapse">
                             <div id="liked-songs-list">
@@ -1013,7 +1338,7 @@
                                         <div class="flex-grow-1 overflow-hidden">
                                             <div class="fw-semibold text-truncate">{{ $historySong->song_name }}</div>
                                             <div class="sidebar-subtitle text-truncate">{{ $historySong->artist_name }}</div>
-                                            <div class="history-status text-truncate"><i class="far fa-clock me-1"></i>Vừa xong</div>
+                                            <div class="history-status text-truncate"><i class="far fa-clock me-1"></i>{{ \Illuminate\Support\Carbon::parse($historySong->listened_at)->format('H:i d/m/Y') }}</div>
                                         </div>
                                     </button>
                                 @endforeach
@@ -1026,6 +1351,9 @@
                         <h6 class="playlist-title">Playlist của bạn</h6>
                         <div id="my-playlist-list">
                         @forelse($my_playlists as $playlist)
+                            @php
+                                $playlistSongs = ($playlist_songs_map ?? collect())->get($playlist->playlist_id, collect());
+                            @endphp
                             <div class="playlist-chip-wrap" data-playlist-item data-playlist-id="{{ $playlist->playlist_id }}">
                                 <button type="button" class="playlist-chip">
                                     <span class="playlist-chip-icon"><i class="fas fa-music"></i></span>
@@ -1033,7 +1361,7 @@
                                 </button>
                                 <button
                                     type="button"
-                                    class="playlist-chip-menu-btn dropdown-toggle"
+                                    class="playlist-chip-menu-btn"
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false"
                                     data-playlist-menu
@@ -1047,6 +1375,32 @@
                                         </button>
                                     </li>
                                 </ul>
+                                <div class="playlist-song-list" data-playlist-songs>
+                                    @foreach($playlistSongs as $playlistSong)
+                                        <div class="playlist-song-wrap" data-playlist-song-item data-song-id="{{ $playlistSong->song_id }}" data-playlist-id="{{ $playlist->playlist_id }}">
+                                            <button type="button" class="playlist-song-item" data-queue-song data-song-id="{{ $playlistSong->song_id }}">
+                                                <div class="playlist-song-name text-truncate">{{ $playlistSong->song_name }}</div>
+                                                <div class="playlist-song-artist text-truncate">{{ $playlistSong->artist_name }}</div>
+                                            </button>
+                                            <button type="button" class="playlist-song-menu-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end playlist-song-dropdown">
+                                                <li>
+                                                    <button
+                                                        type="button"
+                                                        class="dropdown-item"
+                                                        data-playlist-song-remove
+                                                        data-playlist-id="{{ $playlist->playlist_id }}"
+                                                        data-song-id="{{ $playlistSong->song_id }}"
+                                                    >
+                                                        <i class="fas fa-trash me-2"></i>Xóa khỏi playlist
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         @empty
                             <div id="my-playlist-empty" class="small text-muted py-2 px-1">Chưa có playlist nào.</div>
@@ -1105,7 +1459,7 @@
         </footer>
     </div>
 
-    <div class="player-bar d-flex align-items-center px-4 gap-3 flex-wrap">
+    <div class="player-bar is-hidden d-flex align-items-center px-4 gap-3 flex-wrap" id="player-bar">
         <div class="player-left d-flex align-items-center gap-3 w-25">
             <img id="player-cover" src="{{ asset('images/default_song.png') }}" class="player-cover" alt="Ảnh bài hát">
             <div class="player-meta overflow-hidden">
@@ -1137,7 +1491,11 @@
             </div>
             <div class="d-flex align-items-center gap-2 px-lg-5 px-0">
                 <span id="player-current-time" class="small text-muted">0:00</span>
-                <input id="player-progress" type="range" class="form-range player-progress flex-grow-1 mb-0" min="0" max="100" value="0">
+                <div id="player-seekbar" class="player-seekbar" role="slider" aria-label="Tiến trình phát" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="player-seek-fill" class="player-seek-fill">
+                        <span class="player-seek-handle"></span>
+                    </div>
+                </div>
                 <span id="player-duration" class="small text-muted">0:00</span>
             </div>
         </div>
@@ -1150,6 +1508,25 @@
 
     <div id="action-toast" class="action-toast" role="status" aria-live="polite"></div>
 
+    <div class="modal fade playlist-modal" id="addPlaylistModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm vào Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="playlist-modal-label">Chọn Playlist có sẵn:</div>
+                    <select id="playlist-select" class="form-select">
+                        <option value="">-- Chọn playlist --</option>
+                    </select>
+                    <input id="playlist-new-name" type="text" class="form-control mt-2 d-none" placeholder="Nhập tên playlist mới...">
+                    <button type="button" id="playlist-save-btn" class="playlist-modal-save">LƯU</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <audio id="music-audio" preload="metadata"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1160,12 +1537,17 @@
             const likedSongIds = new Set(@json($liked_songs->pluck('song_id')->values()));
             const toggleFavoriteUrl = @json(route('dashboard.favorites.toggle'));
             const addHistoryUrl = @json(route('dashboard.history.add'));
+            const addSongToPlaylistUrl = @json(route('dashboard.playlists.addSong'));
+            const removeSongFromPlaylistUrl = @json(route('dashboard.playlists.removeSong'));
             const deletePlaylistUrl = @json(route('dashboard.playlists.delete'));
             const albumsPageUrl = @json(route('dashboard.albums'));
             const artistsPageUrl = @json(route('dashboard.artists'));
             const csrfToken = @json(csrf_token());
+            const playbackStateKey = 'musicapp.playbackState';
+            const playbackStateWindowKey = '__musicapp_playback_state__';
 
             const audio = document.getElementById('music-audio');
+            const playerBar = document.getElementById('player-bar');
             const cover = document.getElementById('player-cover');
             const title = document.getElementById('player-song-title');
             const artist = document.getElementById('player-song-artist');
@@ -1175,7 +1557,8 @@
             const nextButton = document.getElementById('btn-next');
             const repeatButton = document.getElementById('btn-repeat');
             const likeButton = document.getElementById('btn-like-current');
-            const progress = document.getElementById('player-progress');
+            const seekBar = document.getElementById('player-seekbar');
+            const seekFill = document.getElementById('player-seek-fill');
             const currentTimeLabel = document.getElementById('player-current-time');
             const durationLabel = document.getElementById('player-duration');
             const volumeRange = document.getElementById('player-volume');
@@ -1190,12 +1573,31 @@
             const queueClearAllButton = document.getElementById('queue-clear-all');
             const playlistContainer = document.getElementById('my-playlist-list');
             const playlistEmpty = document.getElementById('my-playlist-empty');
+            const addPlaylistModalEl = document.getElementById('addPlaylistModal');
+            const playlistSelect = document.getElementById('playlist-select');
+            const playlistNewNameInput = document.getElementById('playlist-new-name');
+            const playlistSaveButton = document.getElementById('playlist-save-btn');
+
+            const addPlaylistModal = addPlaylistModalEl ? new bootstrap.Modal(addPlaylistModalEl) : null;
 
             let currentIndex = 0;
             let shuffleEnabled = false;
             let repeatMode = 'all';
             let toastTimer = null;
             let lastHistorySongId = null;
+            let lastHistoryRecordedAt = 0;
+            let pendingPlaylistSong = null;
+            let isSeeking = false;
+            let isRestoringPlayback = false;
+            let lastSavedSecond = -1;
+
+            function revealPlayerBar() {
+                if (!playerBar) {
+                    return;
+                }
+
+                playerBar.classList.remove('is-hidden');
+            }
 
             function showToast(message, type = 'info') {
                 if (!actionToast) {
@@ -1292,6 +1694,27 @@
                 songs.push(song);
 
                 return { index: songs.length - 1, added: true };
+            }
+
+            function ensurePlaybackQueue() {
+                if (songs.length > 0) {
+                    return true;
+                }
+
+                if (!Array.isArray(songCatalog) || songCatalog.length === 0) {
+                    showToast('Chua co bai hat de phat', 'info');
+                    return false;
+                }
+
+                songCatalog.forEach(function (song) {
+                    songs.push(song);
+                });
+
+                if (currentIndex < 0 || currentIndex >= songs.length) {
+                    currentIndex = 0;
+                }
+
+                return songs.length > 0;
             }
 
             function createSidebarSongButton(song, type, index) {
@@ -1497,7 +1920,7 @@
 
                 const status = document.createElement('div');
                 status.className = 'history-status text-truncate';
-                status.innerHTML = '<i class="far fa-clock me-1"></i>Vừa xong';
+                status.innerHTML = `<i class="far fa-clock me-1"></i>${formatHistoryDateTime(song.listened_at)}`;
 
                 content.appendChild(songName);
                 content.appendChild(artistName);
@@ -1506,6 +1929,26 @@
                 button.appendChild(content);
 
                 return button;
+            }
+
+            function formatHistoryDateTime(value) {
+                const date = value ? new Date(value) : new Date();
+
+                if (Number.isNaN(date.getTime())) {
+                    return '';
+                }
+
+                const pad = function (num) {
+                    return String(num).padStart(2, '0');
+                };
+
+                const hours = pad(date.getHours());
+                const minutes = pad(date.getMinutes());
+                const day = pad(date.getDate());
+                const month = pad(date.getMonth() + 1);
+                const year = date.getFullYear();
+
+                return `${hours}:${minutes} ${day}/${month}/${year}`;
             }
 
             function addSongToHistoryList(song) {
@@ -1527,6 +1970,35 @@
                 }
 
                 refreshSidebarEmptyStates();
+            }
+
+            function pushHistoryRealtime(song, force = false) {
+                if (!song) {
+                    return;
+                }
+
+                const songId = Number(song.song_id);
+
+                if (!songId) {
+                    return;
+                }
+
+                const now = Date.now();
+                const isDuplicateInShortTime = songId === lastHistorySongId && (now - lastHistoryRecordedAt) < 30000;
+
+                if (!force && isDuplicateInShortTime) {
+                    return;
+                }
+
+                const historySong = {
+                    ...song,
+                    listened_at: new Date().toISOString(),
+                };
+
+                lastHistorySongId = songId;
+                lastHistoryRecordedAt = now;
+                addSongToHistoryList(historySong);
+                addHistoryOnServer(songId).catch(function () {});
             }
 
             function addSongToSidebarList(song, type) {
@@ -1642,7 +2114,7 @@
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
                 currentTimeLabel.textContent = '0:00';
                 durationLabel.textContent = '0:00';
-                progress.value = 0;
+                setSeekVisual(0);
                 currentIndex = 0;
 
                 updateActiveStates(0);
@@ -1712,12 +2184,166 @@
                 return response.json();
             }
 
+            async function addSongToPlaylistOnServer(songId, playlistName = '', playlistId = 0) {
+                const response = await fetch(addSongToPlaylistUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        song_id: Number(songId),
+                        playlist_name: playlistName,
+                        playlist_id: Number(playlistId || 0),
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Add song to playlist failed');
+                }
+
+                return response.json();
+            }
+
+            async function removeSongFromPlaylistOnServer(playlistId, songId) {
+                const response = await fetch(removeSongFromPlaylistUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        playlist_id: Number(playlistId),
+                        song_id: Number(songId),
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Remove song from playlist failed');
+                }
+
+                return response.json();
+            }
+
+            function createPlaylistItem(playlist) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'playlist-chip-wrap';
+                wrapper.dataset.playlistItem = '';
+                wrapper.dataset.playlistId = String(playlist.playlist_id);
+
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'playlist-chip';
+                chip.innerHTML = '<span class="playlist-chip-icon"><i class="fas fa-music"></i></span><span class="playlist-chip-name"></span>';
+                const chipName = chip.querySelector('.playlist-chip-name');
+                if (chipName) {
+                    chipName.textContent = playlist.playlist_name || 'Playlist mới';
+                }
+
+                const menuButton = document.createElement('button');
+                menuButton.type = 'button';
+                menuButton.className = 'playlist-chip-menu-btn';
+                menuButton.dataset.bsToggle = 'dropdown';
+                menuButton.setAttribute('aria-expanded', 'false');
+                menuButton.setAttribute('data-playlist-menu', '');
+                menuButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+
+                const menu = document.createElement('ul');
+                menu.className = 'dropdown-menu dropdown-menu-end playlist-dropdown';
+                menu.innerHTML = `<li><button type="button" class="dropdown-item" data-playlist-remove="" data-playlist-id="${playlist.playlist_id}"><i class="fas fa-trash me-2"></i>Xóa Playlist</button></li>`;
+
+                const songs = document.createElement('div');
+                songs.className = 'playlist-song-list';
+                songs.setAttribute('data-playlist-songs', '');
+
+                wrapper.appendChild(chip);
+                wrapper.appendChild(menuButton);
+                wrapper.appendChild(menu);
+                wrapper.appendChild(songs);
+
+                return wrapper;
+            }
+
+            function addSongToPlaylistDisplay(playlistId, song) {
+                if (!playlistContainer || !song) {
+                    return;
+                }
+
+                const playlistItem = playlistContainer.querySelector(`[data-playlist-item][data-playlist-id="${playlistId}"]`);
+
+                if (!playlistItem) {
+                    return;
+                }
+
+                let songsContainer = playlistItem.querySelector('[data-playlist-songs]');
+
+                if (!songsContainer) {
+                    songsContainer = document.createElement('div');
+                    songsContainer.className = 'playlist-song-list';
+                    songsContainer.setAttribute('data-playlist-songs', '');
+                    playlistItem.appendChild(songsContainer);
+                }
+
+                const exists = songsContainer.querySelector(`[data-song-id="${song.song_id}"]`);
+
+                if (exists) {
+                    exists.remove();
+                }
+
+                const songWrap = document.createElement('div');
+                songWrap.className = 'playlist-song-wrap';
+                songWrap.dataset.playlistSongItem = '';
+                songWrap.dataset.songId = String(song.song_id);
+                songWrap.dataset.playlistId = String(playlistId);
+                songWrap.innerHTML = `<button type="button" class="playlist-song-item" data-queue-song="" data-song-id="${song.song_id}"><div class="playlist-song-name text-truncate">${song.song_name || 'Unknown'}</div><div class="playlist-song-artist text-truncate">${song.artist_name || ''}</div></button><button type="button" class="playlist-song-menu-btn" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button><ul class="dropdown-menu dropdown-menu-end playlist-song-dropdown"><li><button type="button" class="dropdown-item" data-playlist-song-remove="" data-playlist-id="${playlistId}" data-song-id="${song.song_id}"><i class="fas fa-trash me-2"></i>Xóa khỏi playlist</button></li></ul>`;
+
+                songsContainer.insertBefore(songWrap, songsContainer.firstChild);
+
+                while (songsContainer.children.length > 8) {
+                    songsContainer.removeChild(songsContainer.lastChild);
+                }
+            }
+
             function refreshPlaylistEmptyState() {
                 if (!playlistContainer || !playlistEmpty) {
                     return;
                 }
 
                 playlistEmpty.classList.toggle('d-none', playlistContainer.children.length > 0);
+            }
+
+            function loadPlaylistOptions() {
+                if (!playlistSelect) {
+                    return;
+                }
+
+                playlistSelect.innerHTML = '<option value="">-- Chọn playlist --</option>';
+
+                const playlistItems = playlistContainer
+                    ? Array.from(playlistContainer.querySelectorAll('[data-playlist-item]'))
+                    : [];
+
+                playlistItems.forEach(function (item) {
+                    const playlistId = item.dataset.playlistId || '';
+                    const nameNode = item.querySelector('.playlist-chip-name');
+                    const playlistName = nameNode ? nameNode.textContent.trim() : '';
+
+                    if (!playlistId || !playlistName) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.value = playlistId;
+                    option.textContent = playlistName;
+                    playlistSelect.appendChild(option);
+                });
+
+                const newOption = document.createElement('option');
+                newOption.value = '__new__';
+                newOption.textContent = '+ Tạo playlist mới';
+                playlistSelect.appendChild(newOption);
             }
 
             function formatTime(seconds) {
@@ -1732,16 +2358,71 @@
                 return `${minutes}:${remainder}`;
             }
 
+            function setSeekVisual(percent) {
+                const clamped = Math.min(100, Math.max(0, Number(percent) || 0));
+
+                if (seekFill) {
+                    seekFill.style.width = `${clamped}%`;
+                }
+
+                if (seekBar) {
+                    seekBar.setAttribute('aria-valuenow', String(Math.round(clamped)));
+                }
+            }
+
+            function seekAudioToPercent(percent) {
+                if (!audio.duration) {
+                    return;
+                }
+
+                const normalizedPercent = Math.min(100, Math.max(0, Number(percent) || 0));
+                const nextTime = (normalizedPercent / 100) * audio.duration;
+
+                if (Number.isFinite(nextTime)) {
+                    audio.currentTime = nextTime;
+                    setSeekVisual(normalizedPercent);
+                }
+            }
+
+            function seekAudioToClientX(clientX) {
+                if (!audio.duration || !seekBar) {
+                    return;
+                }
+
+                const rect = seekBar.getBoundingClientRect();
+                const percent = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+                seekAudioToPercent(percent * 100);
+                currentTimeLabel.textContent = formatTime(audio.currentTime);
+            }
+
             function getSongSource(song) {
                 if (!song || !song.song_url) {
                     return '';
                 }
 
-                if (song.song_url.startsWith('http://') || song.song_url.startsWith('https://')) {
-                    return song.song_url;
+                const rawUrl = String(song.song_url || '').trim();
+
+                if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+                    return rawUrl;
                 }
 
-                return @json(asset('storage/audio')) + '/' + song.song_url;
+                if (rawUrl.startsWith('/storage/')) {
+                    return rawUrl;
+                }
+
+                if (rawUrl.startsWith('storage/')) {
+                    return '/' + rawUrl;
+                }
+
+                if (rawUrl.startsWith('song/')) {
+                    return '/storage/' + rawUrl;
+                }
+
+                if (rawUrl.startsWith('/song/')) {
+                    return '/storage' + rawUrl;
+                }
+
+                return '/storage/song/' + rawUrl;
             }
 
             function updateLikeButton(song) {
@@ -1774,12 +2455,18 @@
                 document.querySelectorAll('[data-liked-item]').forEach(function (item) {
                     item.classList.toggle('active-song', Number(item.dataset.songId) === Number(songId));
                 });
+
+                document.querySelectorAll('[data-playlist-song-item]').forEach(function (item) {
+                    item.classList.toggle('active-song', Number(item.dataset.songId) === Number(songId));
+                });
             }
 
             function updatePlayer(song, autoplay = false) {
                 if (!song) {
                     return;
                 }
+
+                revealPlayerBar();
 
                 currentIndex = songs.findIndex(function (item) {
                     return Number(item.song_id) === Number(song.song_id);
@@ -1794,17 +2481,203 @@
                 audio.volume = volumeRange.value / 100;
                 currentTimeLabel.textContent = '0:00';
                 durationLabel.textContent = formatTime(Number(song.duration || 0));
-                progress.value = 0;
+                setSeekVisual(0);
 
                 updateActiveStates(song.song_id);
                 updateLikeButton(song);
 
                 if (autoplay) {
+                    pushHistoryRealtime(song);
                     audio.play().catch(function () {
                         playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
                     });
                 } else {
                     playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            }
+
+            function savePlaybackState() {
+                if (!audio || !songs.length || currentIndex < 0 || !songs[currentIndex]) {
+                    return;
+                }
+
+                if (isRestoringPlayback) {
+                    return;
+                }
+
+                const currentSong = songs[currentIndex];
+                const state = {
+                    song_id: Number(currentSong.song_id || 0),
+                    song_data: currentSong,
+                    current_time: Number(audio.currentTime || 0),
+                    volume: Number(audio.volume || 0),
+                    paused: Boolean(audio.paused),
+                    shuffle_enabled: Boolean(shuffleEnabled),
+                    repeat_mode: repeatMode,
+                };
+
+                try {
+                    sessionStorage.setItem(playbackStateKey, JSON.stringify(state));
+                } catch (error) {}
+
+                try {
+                    window.name = `${playbackStateWindowKey}${JSON.stringify(state)}`;
+                } catch (error) {}
+            }
+
+            function getPersistedPlaybackStateRaw() {
+                let rawState = '';
+
+                try {
+                    rawState = sessionStorage.getItem(playbackStateKey) || '';
+                } catch (error) {}
+
+                if (rawState) {
+                    return rawState;
+                }
+
+                try {
+                    const winName = String(window.name || '');
+
+                    if (winName.startsWith(playbackStateWindowKey)) {
+                        return winName.slice(playbackStateWindowKey.length);
+                    }
+                } catch (error) {}
+
+                return '';
+            }
+
+            function restorePlaybackState() {
+                const rawState = getPersistedPlaybackStateRaw();
+
+                if (!rawState) {
+                    return false;
+                }
+
+                let state = null;
+
+                try {
+                    state = JSON.parse(rawState);
+                } catch (error) {
+                    return false;
+                }
+
+                if (!state) {
+                    return false;
+                }
+
+                const songId = Number(state.song_id || 0);
+
+                if (!songId) {
+                    return false;
+                }
+
+                shuffleEnabled = Boolean(state.shuffle_enabled);
+                if (['off', 'one', 'all'].includes(state.repeat_mode)) {
+                    repeatMode = state.repeat_mode;
+                }
+                updateControlStates();
+
+                const restoredSong = getSongById(songId) || state.song_data;
+
+                if (!restoredSong) {
+                    return false;
+                }
+
+                const queueResult = ensureSongInQueue(restoredSong);
+
+                if (queueResult.added) {
+                    addSongToSidebarList(restoredSong, 'queue');
+                }
+
+                isRestoringPlayback = true;
+                updatePlayer(songs[queueResult.index], false);
+
+                const restoreVolume = Number(state.volume);
+                if (Number.isFinite(restoreVolume) && restoreVolume >= 0 && restoreVolume <= 1) {
+                    audio.volume = restoreVolume;
+                    if (volumeRange) {
+                        volumeRange.value = String(Math.round(restoreVolume * 100));
+                    }
+                }
+
+                const resumeAt = Number(state.current_time || 0);
+                const shouldPlay = state.paused === false;
+
+                const applyResumeState = function () {
+                    const finishRestore = function () {
+                        isRestoringPlayback = false;
+                        savePlaybackState();
+                    };
+
+                    if (Number.isFinite(resumeAt) && resumeAt > 0) {
+                        const safeTime = audio.duration
+                            ? Math.min(resumeAt, Math.max(0, audio.duration - 0.25))
+                            : resumeAt;
+                        audio.currentTime = safeTime;
+                        currentTimeLabel.textContent = formatTime(safeTime);
+
+                        if (audio.duration) {
+                            setSeekVisual((safeTime / audio.duration) * 100);
+                        }
+                    }
+
+                    if (shouldPlay) {
+                        audio.play().then(function () {
+                            if (Number.isFinite(resumeAt) && resumeAt > 0) {
+                                const safeTimeAfterPlay = audio.duration
+                                    ? Math.min(resumeAt, Math.max(0, audio.duration - 0.25))
+                                    : resumeAt;
+                                audio.currentTime = safeTimeAfterPlay;
+                                if (audio.duration) {
+                                    setSeekVisual((safeTimeAfterPlay / audio.duration) * 100);
+                                }
+                            }
+
+                            finishRestore();
+                        }).catch(function () {
+                            finishRestore();
+                        });
+                        return;
+                    }
+
+                    finishRestore();
+                };
+
+                if (audio.readyState >= 1) {
+                    applyResumeState();
+                } else {
+                    audio.addEventListener('loadedmetadata', applyResumeState, { once: true });
+                    audio.addEventListener('canplay', applyResumeState, { once: true });
+                }
+
+                return true;
+            }
+
+            function savePlaybackStateOnNavigationIntent(event) {
+                const target = event.target;
+
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const link = target.closest('a[href]');
+
+                if (link) {
+                    const href = (link.getAttribute('href') || '').trim();
+
+                    if (!href || href.startsWith('#') || href.toLowerCase().startsWith('javascript:')) {
+                        return;
+                    }
+
+                    savePlaybackState();
+                    return;
+                }
+
+                const form = target.closest('form');
+
+                if (form) {
+                    savePlaybackState();
                 }
             }
 
@@ -1825,21 +2698,46 @@
             }
 
             function playNext() {
-                if (!songs.length) {
+                if (!ensurePlaybackQueue()) {
                     return;
                 }
 
-                if (shuffleEnabled) {
-                    currentIndex = Math.floor(Math.random() * songs.length);
-                } else {
-                    currentIndex = (currentIndex + 1) % songs.length;
+                const navigationList = Array.isArray(songCatalog) && songCatalog.length > 0 ? songCatalog : songs;
+                const currentSongId = Number(songs[currentIndex]?.song_id || 0);
+                const currentNavIndex = navigationList.findIndex(function (item) {
+                    return Number(item.song_id) === currentSongId;
+                });
+
+                if (!navigationList.length) {
+                    return;
                 }
 
-                updatePlayer(songs[currentIndex], true);
+                let targetIndex = currentNavIndex > -1 ? currentNavIndex : 0;
+
+                if (shuffleEnabled) {
+                    targetIndex = Math.floor(Math.random() * navigationList.length);
+
+                    if (navigationList.length > 1) {
+                        while (targetIndex === currentNavIndex) {
+                            targetIndex = Math.floor(Math.random() * navigationList.length);
+                        }
+                    }
+                } else {
+                    targetIndex = (targetIndex + 1) % navigationList.length;
+                }
+
+                const nextSong = navigationList[targetIndex];
+                const queueResult = ensureSongInQueue(nextSong);
+
+                if (queueResult.added) {
+                    addSongToSidebarList(nextSong, 'queue');
+                }
+
+                updatePlayer(songs[queueResult.index], true);
             }
 
             function playPrevious() {
-                if (!songs.length) {
+                if (!ensurePlaybackQueue()) {
                     return;
                 }
 
@@ -1848,17 +2746,46 @@
                     return;
                 }
 
-                if (shuffleEnabled) {
-                    currentIndex = Math.floor(Math.random() * songs.length);
-                } else {
-                    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+                const navigationList = Array.isArray(songCatalog) && songCatalog.length > 0 ? songCatalog : songs;
+                const currentSongId = Number(songs[currentIndex]?.song_id || 0);
+                const currentNavIndex = navigationList.findIndex(function (item) {
+                    return Number(item.song_id) === currentSongId;
+                });
+
+                if (!navigationList.length) {
+                    return;
                 }
 
-                updatePlayer(songs[currentIndex], true);
+                let targetIndex = currentNavIndex > -1 ? currentNavIndex : 0;
+
+                if (shuffleEnabled) {
+                    targetIndex = Math.floor(Math.random() * navigationList.length);
+
+                    if (navigationList.length > 1) {
+                        while (targetIndex === currentNavIndex) {
+                            targetIndex = Math.floor(Math.random() * navigationList.length);
+                        }
+                    }
+                } else {
+                    targetIndex = (targetIndex - 1 + navigationList.length) % navigationList.length;
+                }
+
+                const prevSong = navigationList[targetIndex];
+                const queueResult = ensureSongInQueue(prevSong);
+
+                if (queueResult.added) {
+                    addSongToSidebarList(prevSong, 'queue');
+                }
+
+                updatePlayer(songs[queueResult.index], true);
             }
 
             function togglePlayPause() {
-                if (!audio.src && songs.length) {
+                if (!audio.src) {
+                    if (!ensurePlaybackQueue()) {
+                        return;
+                    }
+
                     updatePlayer(songs[currentIndex], true);
                     return;
                 }
@@ -1884,14 +2811,113 @@
                 updateControlStates();
             }
 
-            document.querySelectorAll('[data-song-card]').forEach(function (card) {
-                card.addEventListener('click', function (event) {
-                    if (event.target.closest('button, a, .dropdown-menu, .dropdown-toggle')) {
+            function bindSongCardClicks(scope = document) {
+                scope.querySelectorAll('[data-song-card]').forEach(function (card) {
+                    if (card.dataset.playBound === '1') {
                         return;
                     }
 
-                    playSongById(this.dataset.songId, true, this);
+                    card.dataset.playBound = '1';
+                    card.addEventListener('click', function (event) {
+                        if (event.target.closest('button, a, .dropdown-menu, .dropdown-toggle')) {
+                            return;
+                        }
+
+                        playSongById(this.dataset.songId, true, this);
+                    });
                 });
+            }
+
+            function syncTopMenuActive(targetUrl) {
+                let targetPath = '';
+
+                try {
+                    targetPath = new URL(targetUrl, window.location.origin).pathname;
+                } catch (error) {
+                    return;
+                }
+
+                document.querySelectorAll('.top-menu-link').forEach(function (link) {
+                    let linkPath = '';
+
+                    try {
+                        linkPath = new URL(link.href, window.location.origin).pathname;
+                    } catch (error) {
+                        return;
+                    }
+
+                    link.classList.toggle('active', linkPath === targetPath);
+                });
+            }
+
+            async function loadTopMenuContent(url, pushToHistory = true) {
+                savePlaybackState();
+
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Cannot load top menu content');
+                }
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const incomingMain = doc.querySelector('.col-lg-9.col-12');
+                const currentMain = document.querySelector('.col-lg-9.col-12');
+
+                if (!incomingMain || !currentMain) {
+                    throw new Error('Main content block missing');
+                }
+
+                currentMain.innerHTML = incomingMain.innerHTML;
+                bindSongCardClicks(currentMain);
+                syncTopMenuActive(url);
+
+                if (pushToHistory) {
+                    window.history.pushState({ topMenuPartial: true, url: url }, '', url);
+                }
+            }
+
+            bindSongCardClicks();
+
+            document.addEventListener('click', function (event) {
+                const topMenuLink = event.target.closest('.top-menu-link');
+
+                if (!topMenuLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(topMenuLink.href)
+                    .catch(function () {
+                        window.location.href = topMenuLink.href;
+                    });
+            });
+
+            window.addEventListener('popstate', function () {
+                loadTopMenuContent(window.location.href, false).catch(function () {});
+            });
+
+            document.addEventListener('click', function (event) {
+                const playlistChip = event.target.closest('.playlist-chip');
+
+                if (!playlistChip) {
+                    return;
+                }
+
+                const playlistItem = playlistChip.closest('[data-playlist-item]');
+
+                if (!playlistItem) {
+                    return;
+                }
+
+                event.preventDefault();
+                playlistItem.classList.toggle('is-collapsed');
             });
 
             document.addEventListener('click', function (event) {
@@ -1899,6 +2925,54 @@
 
                 if (queueButton) {
                     playSongById(queueButton.dataset.songId, true, queueButton);
+                }
+            });
+
+            document.addEventListener('click', function (event) {
+                const playAllButton = event.target.closest('[data-play-all-songs]');
+
+                if (!playAllButton) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                let songIds = [];
+
+                try {
+                    songIds = JSON.parse(playAllButton.dataset.songIds || '[]');
+                } catch (error) {
+                    songIds = [];
+                }
+
+                if (!Array.isArray(songIds) || songIds.length === 0) {
+                    showToast('Khong co bai hat de phat', 'info');
+                    return;
+                }
+
+                let firstSongId = null;
+
+                songIds.forEach(function (songId) {
+                    const song = getSongById(songId, playAllButton);
+
+                    if (!song) {
+                        return;
+                    }
+
+                    if (firstSongId === null) {
+                        firstSongId = Number(song.song_id);
+                    }
+
+                    const queueResult = ensureSongInQueue(song);
+
+                    if (queueResult.added) {
+                        addSongToSidebarList(song, 'queue');
+                    }
+                });
+
+                if (firstSongId !== null) {
+                    playSongById(firstSongId, true, playAllButton);
+                    showToast('Dang phat toan bo danh sach', 'success');
                 }
             });
 
@@ -1988,6 +3062,66 @@
             });
 
             document.addEventListener('click', function (event) {
+                const removePlaylistSongButton = event.target.closest('[data-playlist-song-remove]');
+
+                if (!removePlaylistSongButton) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const playlistId = Number(removePlaylistSongButton.dataset.playlistId || 0);
+                const songId = Number(removePlaylistSongButton.dataset.songId || 0);
+
+                if (!playlistId || !songId) {
+                    return;
+                }
+
+                removeSongFromPlaylistOnServer(playlistId, songId)
+                    .then(function (data) {
+                        if (!data.deleted) {
+                            showToast('Khong the xoa khoi playlist', 'error');
+                            return;
+                        }
+
+                        const songItem = removePlaylistSongButton.closest('[data-playlist-song-item]');
+
+                        if (songItem) {
+                            songItem.remove();
+                        }
+
+                        showToast('Da xoa khoi playlist', 'success');
+                    })
+                    .catch(function () {
+                        showToast('Khong the xoa khoi playlist', 'error');
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const openLikedButton = event.target.closest('[data-open-liked]');
+
+                if (!openLikedButton) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const likedCollapseEl = document.getElementById('likedSongsCollapse');
+
+                if (!likedCollapseEl) {
+                    return;
+                }
+
+                const collapseInstance = bootstrap.Collapse.getOrCreateInstance(likedCollapseEl, {
+                    toggle: false,
+                });
+
+                collapseInstance.show();
+                likedCollapseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            document.addEventListener('click', function (event) {
                 const actionButton = event.target.closest('[data-action]');
 
                 if (!actionButton) {
@@ -2016,6 +3150,27 @@
 
                         playSongById(song.song_id, false);
                     }
+                }
+
+                if (action === 'playlist') {
+                    const song = getSongById(songId, actionButton);
+
+                    if (!song) {
+                        return;
+                    }
+
+                    if (!addPlaylistModal || !playlistSelect || !playlistSaveButton) {
+                        return;
+                    }
+
+                    pendingPlaylistSong = song;
+                    loadPlaylistOptions();
+                    playlistSelect.value = '';
+                    if (playlistNewNameInput) {
+                        playlistNewNameInput.value = '';
+                        playlistNewNameInput.classList.add('d-none');
+                    }
+                    addPlaylistModal.show();
                 }
 
                 if (action === 'like') {
@@ -2132,34 +3287,27 @@
 
             audio.addEventListener('play', function () {
                 playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-
-                if (!songs[currentIndex]) {
-                    return;
-                }
-
-                const song = songs[currentIndex];
-                const songId = Number(song.song_id);
-
-                if (songId === lastHistorySongId) {
-                    return;
-                }
-
-                lastHistorySongId = songId;
-                addSongToHistoryList(song);
-                addHistoryOnServer(songId).catch(function () {});
+                savePlaybackState();
             });
 
             audio.addEventListener('pause', function () {
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+                savePlaybackState();
             });
 
             audio.addEventListener('timeupdate', function () {
-                if (!audio.duration) {
+                if (!audio.duration || isSeeking) {
                     return;
                 }
 
-                progress.value = (audio.currentTime / audio.duration) * 100;
+                setSeekVisual((audio.currentTime / audio.duration) * 100);
                 currentTimeLabel.textContent = formatTime(audio.currentTime);
+
+                const wholeSecond = Math.floor(audio.currentTime);
+                if (wholeSecond !== lastSavedSecond) {
+                    lastSavedSecond = wholeSecond;
+                    savePlaybackState();
+                }
             });
 
             audio.addEventListener('loadedmetadata', function () {
@@ -2187,16 +3335,73 @@
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             });
 
-            progress.addEventListener('input', function () {
-                if (!audio.duration) {
-                    return;
-                }
+            if (seekBar) {
+                seekBar.addEventListener('pointerdown', function (event) {
+                    event.preventDefault();
+                    isSeeking = true;
 
-                audio.currentTime = (progress.value / 100) * audio.duration;
-            });
+                    if (seekBar.setPointerCapture) {
+                        try {
+                            seekBar.setPointerCapture(event.pointerId);
+                        } catch (error) {}
+                    }
+
+                    seekAudioToClientX(event.clientX);
+                });
+
+                seekBar.addEventListener('pointermove', function (event) {
+                    if (!isSeeking || event.buttons === 0) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    seekAudioToClientX(event.clientX);
+                });
+
+                seekBar.addEventListener('pointerup', function (event) {
+                    event.preventDefault();
+                    seekAudioToClientX(event.clientX);
+                    isSeeking = false;
+
+                    if (seekBar.releasePointerCapture) {
+                        try {
+                            seekBar.releasePointerCapture(event.pointerId);
+                        } catch (error) {}
+                    }
+                });
+
+                seekBar.addEventListener('pointercancel', function () {
+                    isSeeking = false;
+                });
+
+                seekBar.addEventListener('click', function (event) {
+                    seekAudioToClientX(event.clientX);
+                });
+            }
+
 
             volumeRange.addEventListener('input', function () {
                 audio.volume = volumeRange.value / 100;
+                savePlaybackState();
+            });
+
+            document.addEventListener('click', savePlaybackStateOnNavigationIntent, true);
+            document.addEventListener('submit', function () {
+                savePlaybackState();
+            }, true);
+
+            window.addEventListener('pagehide', function () {
+                savePlaybackState();
+            });
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden') {
+                    savePlaybackState();
+                }
+            });
+
+            window.addEventListener('beforeunload', function () {
+                savePlaybackState();
             });
 
             if (queueClearAllButton) {
@@ -2210,13 +3415,90 @@
                 });
             }
 
+            if (playlistSelect && playlistNewNameInput) {
+                playlistSelect.addEventListener('change', function () {
+                    const isNew = playlistSelect.value === '__new__';
+                    playlistNewNameInput.classList.toggle('d-none', !isNew);
+
+                    if (isNew) {
+                        playlistNewNameInput.focus();
+                    }
+                });
+            }
+
+            if (playlistSaveButton && playlistSelect) {
+                playlistSaveButton.addEventListener('click', function () {
+                    if (!pendingPlaylistSong) {
+                        return;
+                    }
+
+                    const selectedValue = playlistSelect.value;
+                    const isNew = selectedValue === '__new__';
+                    const playlistId = !isNew && selectedValue ? Number(selectedValue) : 0;
+                    const playlistName = isNew && playlistNewNameInput ? playlistNewNameInput.value.trim() : '';
+
+                    if (!playlistId && !playlistName) {
+                        showToast('Vui long chon playlist hoac nhap ten moi', 'error');
+                        return;
+                    }
+
+                    addSongToPlaylistOnServer(pendingPlaylistSong.song_id, playlistName, playlistId)
+                        .then(function (data) {
+                            if (!data || !data.playlist) {
+                                showToast('Khong the them vao playlist', 'error');
+                                return;
+                            }
+
+                            if (data.created_playlist && playlistContainer) {
+                                const exists = playlistContainer.querySelector(`[data-playlist-item][data-playlist-id="${data.playlist.playlist_id}"]`);
+
+                                if (!exists) {
+                                    const playlistItem = createPlaylistItem(data.playlist);
+                                    playlistContainer.insertBefore(playlistItem, playlistContainer.firstChild);
+                                    refreshPlaylistEmptyState();
+                                }
+                            }
+
+                            addSongToPlaylistDisplay(data.playlist.playlist_id, pendingPlaylistSong);
+
+                            showToast(
+                                data.added
+                                    ? `Da them vao playlist: ${data.playlist.playlist_name}`
+                                    : `Bai hat da co trong playlist: ${data.playlist.playlist_name}`,
+                                data.added ? 'success' : 'info'
+                            );
+
+                            if (addPlaylistModal) {
+                                addPlaylistModal.hide();
+                            }
+                        })
+                        .catch(function () {
+                            showToast('Khong the them vao playlist', 'error');
+                        });
+                });
+            }
+
+            if (addPlaylistModalEl) {
+                addPlaylistModalEl.addEventListener('hidden.bs.modal', function () {
+                    pendingPlaylistSong = null;
+                    if (playlistSelect) {
+                        playlistSelect.value = '';
+                    }
+                    if (playlistNewNameInput) {
+                        playlistNewNameInput.value = '';
+                        playlistNewNameInput.classList.add('d-none');
+                    }
+                });
+            }
+
             updateControlStates();
             refreshSidebarEmptyStates();
             refreshQueueOrderLabels();
             refreshPlaylistEmptyState();
             refreshLikeActionButtons();
+            const restoredPlayback = restorePlaybackState();
 
-            if (songs.length) {
+            if (!restoredPlayback && !audio.src && songs.length) {
                 updatePlayer(songs[0], false);
             }
         });
