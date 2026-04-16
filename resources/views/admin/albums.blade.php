@@ -133,6 +133,17 @@
 			text-decoration: underline;
 		}
 
+		.album-name-link {
+			color: #111827;
+			text-decoration: none;
+			font-weight: 700;
+		}
+
+		.album-name-link:hover {
+			color: #111827;
+			text-decoration: underline;
+		}
+
 		.status-chip {
 			display: inline-flex;
 			align-items: center;
@@ -383,7 +394,9 @@
 							<td>
 								<img class="album-cover" src="{{ $album['cover_preview'] }}" alt="{{ $album['name'] }}">
 							</td>
-							<td>{{ $album['name'] }}</td>
+							<td>
+								<a class="album-name-link" href="{{ route('admin.albums.songs', $album['id']) }}">{{ $album['name'] }}</a>
+							</td>
 							<td>{{ $album['artist_id'] }}</td>
 							<td>{{ $album['release_date'] ?? '-' }}</td>
 							<td>{{ $album['created_at'] }}</td>
@@ -429,6 +442,7 @@
 				</tbody>
 			</table>
 		</div>
+
 	</section>
 
 	<div class="album-modal-overlay" id="albumModalOverlay" aria-hidden="true">
@@ -575,6 +589,7 @@
 					closeEditModal();
 				}
 			});
+
 		});
 	</script>
 </x-admin-layout>
