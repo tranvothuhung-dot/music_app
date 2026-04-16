@@ -2,6 +2,223 @@
 
 @section('content')
 
+    <style>
+        .album-feature-card {
+            display: block;
+            text-decoration: none;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f8fafc;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+
+        .album-feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+        }
+
+        .album-feature-media {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: #e5e7eb;
+        }
+
+        .album-feature-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .album-feature-card:hover .album-feature-media img {
+            transform: scale(1.04);
+        }
+
+        .album-feature-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.18);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .album-feature-card:hover .album-feature-overlay {
+            opacity: 1;
+        }
+
+        .album-feature-btn {
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #111827;
+            padding: 10px 26px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .album-feature-body {
+            padding: 12px 10px 14px;
+            text-align: center;
+            background: #f3f4f6;
+        }
+
+        .album-feature-title {
+            font-weight: 800;
+            font-size: 0.95rem;
+            line-height: 1.25;
+            color: #1f2937;
+            margin-bottom: 4px;
+            min-height: 2.4em;
+        }
+
+        .album-feature-artist {
+            color: #ff3f86;
+            font-size: 0.82rem;
+            font-weight: 700;
+            min-height: 1.3em;
+        }
+
+        .artist-feature-item {
+            text-align: center;
+        }
+
+        .artist-feature-avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffffff;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+            transition: 0.2s ease;
+        }
+
+        .artist-feature-link:hover .artist-feature-avatar {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+        }
+
+        .artist-feature-name {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+
+        .artist-feature-album-link {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ff3f86;
+            text-decoration: none;
+        }
+
+        .artist-feature-album-link:hover {
+            color: #e83274;
+            text-decoration: underline;
+        }
+
+        .news-home-card {
+            background: #f3f4f6;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .news-home-image {
+            width: 100%;
+            height: 100%;
+            min-height: 140px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .news-home-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .news-home-excerpt {
+            font-size: 1.08rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+            line-height: 1.45;
+        }
+
+        .news-home-meta {
+            color: #6b7280;
+            font-size: 1.02rem;
+            margin-bottom: 2px;
+        }
+
+        .news-home-meta i {
+            color: #ff3f86;
+        }
+
+        .news-home-btn {
+            margin-top: 10px;
+            border-radius: 999px;
+            padding: 9px 24px;
+            font-weight: 700;
+            font-size: 1.02rem;
+        }
+
+        @media (max-width: 991.98px) {
+            .album-feature-overlay {
+                opacity: 1;
+                background: rgba(0, 0, 0, 0.1);
+            }
+
+            .album-feature-btn {
+                font-size: 1.65rem;
+                padding: 12px 28px;
+            }
+
+            .album-feature-title {
+                font-size: 0.92rem;
+            }
+
+            .album-feature-artist {
+                font-size: 0.8rem;
+            }
+
+            .artist-feature-avatar {
+                width: 118px;
+                height: 118px;
+            }
+
+            .artist-feature-name {
+                font-size: 0.9rem;
+            }
+
+            .artist-feature-album-link {
+                font-size: 0.8rem;
+            }
+
+            .news-home-title {
+                font-size: 1.15rem;
+            }
+
+            .news-home-excerpt,
+            .news-home-meta {
+                font-size: 0.95rem;
+            }
+
+            .news-home-btn {
+                font-size: 0.95rem;
+                padding: 8px 20px;
+            }
+        }
+    </style>
+
     <div class="rounded-4 overflow-hidden mb-5 shadow">
         <img src="{{ asset('images/banner.png') }}" class="w-100" style="max-height: 350px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/1200x350/ffb6c1/ffffff?text=MELODY+%26+JOY'">
     </div>
@@ -116,38 +333,83 @@
         @endforeach
     </div>
 
-    <div class="row mb-5">
-        <div class="col-md-7 mb-4 mb-md-0">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="section-title m-0">Album Nổi Bật</h2>
-            </div>
-            <div class="row row-cols-1 row-cols-sm-2 g-3">
-                @foreach($albums as $al)
-                <div class="col">
-                    <div class="d-flex align-items-center p-2 bg-white rounded-3 shadow-sm border border-light custom-card" style="cursor: pointer; height: auto;">
-                        <img src="{{ asset('images/'.$al->cover_image) }}" width="60" height="60" class="rounded object-fit-cover" onerror="this.src='https://via.placeholder.com/60'">
-                        <div class="ms-3 overflow-hidden">
-                            <div class="fw-bold text-truncate" style="font-size: 0.95rem;">{{ $al->album_name }}</div>
-                            <small class="text-primary text-truncate">{{ $al->artist_name }}</small>
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title m-0">Album Nổi Bật</h2>
+            <a href="{{ route('dashboard.albums') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Xem tất cả</a>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+            @foreach($albums as $al)
+            <div class="col">
+                <a href="{{ route('dashboard.albums', ['album_id' => $al->album_id]) }}" class="album-feature-card">
+                    <div class="album-feature-media">
+                        <img src="{{ asset('images/'.$al->cover_image) }}" alt="{{ $al->album_name }}" onerror="this.src='https://via.placeholder.com/400'">
+                        <div class="album-feature-overlay">
+                            <span class="album-feature-btn">Xem Album</span>
                         </div>
                     </div>
-                </div>
-                @endforeach
+                    <div class="album-feature-body">
+                        <div class="album-feature-title">{{ $al->album_name }}</div>
+                        <div class="album-feature-artist">{{ $al->artist_name }}</div>
+                    </div>
+                </a>
             </div>
+            @endforeach
         </div>
-        
-        <div class="col-md-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="section-title m-0">Nghệ Sĩ</h2>
+    </div>
+
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title m-0">Nghệ Sĩ Nổi Bật</h2>
+            <a href="{{ route('dashboard.artists') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Xem tất cả</a>
+        </div>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
+            @foreach($artists_list as $art)
+            <div class="col artist-feature-item">
+                <a href="{{ route('dashboard.artists', ['artist_id' => $art->artist_id]) }}" class="artist-feature-link text-decoration-none d-inline-block" title="{{ $art->artist_name }}">
+                    <img src="{{ asset('images/'.$art->avatar_image) }}" class="artist-feature-avatar" alt="{{ $art->artist_name }}" onerror="this.src='https://via.placeholder.com/130'">
+                    <div class="artist-feature-name text-truncate">{{ $art->artist_name }}</div>
+                </a>
+                <a href="{{ route('dashboard.albums', ['artist_id' => $art->artist_id]) }}" class="artist-feature-album-link">Xem album</a>
             </div>
-            <div class="d-flex flex-wrap gap-3">
-                @foreach($artists_list as $art)
-                <div class="text-center" style="width: 75px; cursor: pointer;">
-                    <img src="{{ asset('images/'.$art->avatar_image) }}" class="rounded-circle border border-2 border-white shadow-sm" style="width: 70px; height: 70px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/70'">
-                    <div class="small text-truncate mt-2 fw-semibold">{{ $art->artist_name }}</div>
-                </div>
-                @endforeach
-            </div>
+            @endforeach
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title m-0">Tin Tức</h2>
+            <a href="{{ route('dashboard.news') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Xem tất cả</a>
+        </div>
+
+        <div class="d-flex flex-column gap-4">
+            @forelse($news_list ?? [] as $item)
+                <article class="news-home-card">
+                    <div class="row g-0 align-items-stretch">
+                        <div class="col-12 col-md-3">
+                            <img
+                                src="{{ asset('images/'.($item->new_image ?? 'banner.png')) }}"
+                                onerror="this.src='https://via.placeholder.com/540x300'"
+                                alt="{{ $item->title ?? 'Tin tức' }}"
+                                class="news-home-image"
+                            >
+                        </div>
+                        <div class="col-12 col-md-9">
+                            <div class="p-3 p-md-4 h-100 d-flex flex-column justify-content-center">
+                                <h4 class="news-home-title">{{ $item->title ?? 'Tin tức mới' }}</h4>
+                                <p class="news-home-excerpt mb-2">{{ \Illuminate\Support\Str::limit(strip_tags($item->description ?? ''), 120) }}</p>
+                                <div class="news-home-meta"><i class="fas fa-calendar-alt me-2"></i>{{ !empty($item->event_date) ? date('d/m/Y', strtotime($item->event_date)) : (!empty($item->created_at) ? date('d/m/Y', strtotime($item->created_at)) : 'Đang cập nhật') }}</div>
+                                <div class="news-home-meta"><i class="fas fa-map-marker-alt me-2"></i>{{ $item->location ?? 'Địa điểm đang cập nhật' }}</div>
+                                <div>
+                                    <a href="{{ route('dashboard.news') }}" class="btn btn-primary news-home-btn">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="alert alert-light border text-muted mb-0">Chưa có tin tức.</div>
+            @endforelse
         </div>
     </div>
 

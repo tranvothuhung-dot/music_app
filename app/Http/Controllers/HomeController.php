@@ -162,6 +162,7 @@ class HomeController extends Controller
     public function albums(Request $request)
     {
         $albumId = (int) $request->query('album_id', 0);
+        $artistId = (int) $request->query('artist_id', 0);
 
         $albumsQuery = DB::table('albums as al')
             ->join('artists as a', 'al.artist_id', '=', 'a.artist_id')
@@ -171,11 +172,16 @@ class HomeController extends Controller
             $albumsQuery->where('al.album_id', $albumId);
         }
 
+        if ($artistId > 0) {
+            $albumsQuery->where('al.artist_id', $artistId);
+        }
+
         $albums = $albumsQuery->paginate(20)->withQueryString();
 
         return view('music.albums', array_merge([
             'albums' => $albums,
             'selected_album_id' => $albumId,
+            'selected_artist_id' => $artistId,
         ], $this->dashboardSharedData()));
     }
 

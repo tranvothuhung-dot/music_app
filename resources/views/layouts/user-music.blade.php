@@ -548,6 +548,13 @@
 
         .song-card {
             cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .song-card:hover,
+        .song-card:focus-within {
+            z-index: 40;
         }
 
         .song-card.active-song {
@@ -565,6 +572,7 @@
 
         .song-card .dropdown-menu {
             min-width: 240px;
+            z-index: 3000;
         }
 
         .player-cover {
@@ -778,6 +786,121 @@
                 font-size: 0.92rem;
             }
         }
+
+        .site-footer {
+            margin-top: 28px;
+            padding: 42px 0 120px;
+            border-top: 1px solid #dfe3eb;
+            color: #374151;
+        }
+
+        .footer-brand {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .footer-text {
+            color: #4b5563;
+            line-height: 1.6;
+            max-width: 340px;
+            margin-bottom: 16px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 10px;
+        }
+
+        .footer-social {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #eef1f5;
+            color: #4b5563;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .footer-social:hover {
+            background: #ff5f9a;
+            color: #fff;
+        }
+
+        .footer-heading {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .footer-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: #ff3f86;
+        }
+
+        .footer-subscribe {
+            display: flex;
+            border: 1px solid #cfd6df;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 360px;
+            background: #fff;
+        }
+
+        .footer-subscribe input {
+            border: 0;
+            padding: 10px 12px;
+            width: 100%;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .footer-subscribe button {
+            border: 0;
+            width: 44px;
+            background: #ff3f86;
+            color: #fff;
+        }
+
+        .footer-bottom {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid #dfe3eb;
+            color: #4b5563;
+            text-align: center;
+        }
+
+        @media (max-width: 991.98px) {
+            .site-footer {
+                padding-bottom: 150px;
+            }
+
+            .footer-col {
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body class="bg-light pb-5 mb-5">
@@ -940,6 +1063,46 @@
                 @yield('content')
             </div>
         </div>
+
+        <footer class="site-footer">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6 footer-col">
+                    <div class="footer-brand">MusicApp</div>
+                    <p class="footer-text">Thế giới âm nhạc trong tầm tay. Nghe nhạc chất lượng cao, cập nhật xu hướng mới nhất mỗi ngày.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="footer-social" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="footer-social" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="footer-social" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 footer-col">
+                    <h6 class="footer-heading">Khám Phá</h6>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('dashboard') }}">Trang chủ</a></li>
+                        <li><a href="{{ route('dashboard.songs') }}">Bài hát mới</a></li>
+                        <li><a href="{{ route('dashboard.albums') }}">Album Hot</a></li>
+                        <li><a href="{{ route('dashboard.artists') }}">Nghệ sĩ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 footer-col">
+                    <h6 class="footer-heading">Hỗ Trợ</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Điều khoản</a></li>
+                        <li><a href="#">Bảo mật</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="#">Góp ý</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6 footer-col">
+                    <h6 class="footer-heading">Đăng Ký Nhận Tin</h6>
+                    <form class="footer-subscribe" action="#" method="post" onsubmit="event.preventDefault();">
+                        <input type="email" placeholder="Email của bạn..." aria-label="Email đăng ký">
+                        <button type="submit" aria-label="Gửi đăng ký"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">&copy; {{ date('Y') }} <strong>MusicApp</strong>. All rights reserved.</div>
+        </footer>
     </div>
 
     <div class="player-bar d-flex align-items-center px-4 gap-3 flex-wrap">
