@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -9,13 +10,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-class AdminController extends Controller
+class UsersController extends Controller
 {
     public function users(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
 
         $users = User::query()
+            ->where('status', 1)
             ->when($search !== '', function ($query) use ($search) {
                 if (ctype_digit($search)) {
                     $query->where(function ($subQuery) use ($search) {
@@ -56,6 +58,7 @@ class AdminController extends Controller
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['status'] = 1;
 
         User::create($validated);
 
@@ -109,7 +112,7 @@ class AdminController extends Controller
                 ->with('error', 'Bạn không thể xóa tài khoản đang đăng nhập.');
         }
 
-        $user->delete();
+        $user->update(['status' => 0]);
 
         return redirect()
             ->route('admin.users.index')
