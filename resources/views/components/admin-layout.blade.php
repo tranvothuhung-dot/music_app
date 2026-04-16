@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWix+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8NWT9fpmjHtk8K+q4M7gJxR8VJ6Yx8g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
@@ -33,7 +33,8 @@
 
         body {
             margin: 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
             color: var(--text);
             background: linear-gradient(145deg, #f2f4f8, #e7ebf2);
             min-height: 100vh;
@@ -61,7 +62,7 @@
             gap: 10px;
             margin: 6px 8px 24px;
             color: var(--primary);
-            font-weight: 700;
+            font-weight: 800;
             font-size: 34px;
             letter-spacing: 0.2px;
             text-decoration: none;
@@ -95,7 +96,7 @@
             border-radius: 999px;
             text-decoration: none;
             color: var(--text);
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.25s ease;
         }
 

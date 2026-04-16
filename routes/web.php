@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +22,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
 
-        Route::view('/users', 'admin.placeholder', [
-            'title' => 'Người Dùng - Admin',
-            'heading' => 'Người Dùng',
-            'description' => 'Trang quản lý người dùng sẽ được hiển thị ở đây.',
-        ])->name('users.index');
+        Route::get('/users', [UsersController::class, 'users'])->name('users.index');
+        Route::post('/users', [UsersController::class, 'storeUser'])->name('users.store');
+        Route::put('/users/{user}', [UsersController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{user}', [UsersController::class, 'destroyUser'])->name('users.destroy');
 
         Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
         Route::post('/artists', [ArtistController::class, 'store'])->name('artists.store');
