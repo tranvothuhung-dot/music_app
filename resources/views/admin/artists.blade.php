@@ -56,7 +56,7 @@
             background: #2f3946;
             color: #fff;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             padding: 0 10px;
             display: inline-flex;
@@ -73,7 +73,7 @@
             background: linear-gradient(135deg, #ff5897, #ff3f85);
             color: #fff;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0 18px;
             cursor: pointer;
             box-shadow: 0 8px 18px rgba(255, 70, 139, 0.24);
