@@ -956,15 +956,23 @@
             gap: 12px;
         }
 
+        .user-avatar-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border-radius: 999px;
+        }
+
         .user-menu-toggle {
-            border: 2px solid #1f2937;
+            border: 0;
             border-radius: 8px;
             background: #fff;
             color: #111827;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 3px 10px 3px 4px;
+            padding: 4px 10px;
             line-height: 1;
             font-weight: 700;
             max-width: 200px;
@@ -978,7 +986,7 @@
         .user-menu-toggle:hover,
         .user-menu-toggle:focus,
         .user-menu-toggle:active {
-            border-color: #111827 !important;
+            border-color: transparent !important;
             background: #fff !important;
             color: #111827 !important;
         }
@@ -988,8 +996,9 @@
             height: 30px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #d1d5db;
+            border: 2px solid #ff3f86;
             flex-shrink: 0;
+            cursor: pointer;
         }
 
         .user-menu-name {
@@ -1082,7 +1091,7 @@
         .footer-brand {
             font-size: 1.8rem;
             font-weight: 800;
-            color: #111827;
+            color: #ff3f86;
             margin-bottom: 10px;
         }
 
@@ -1104,7 +1113,7 @@
             height: 36px;
             border-radius: 50%;
             background: #eef1f5;
-            color: #4b5563;
+            color: #ff3f86;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -1120,7 +1129,7 @@
         .footer-heading {
             font-size: 0.95rem;
             font-weight: 800;
-            color: #111827;
+            color: #ff3f86;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.02em;
@@ -1143,7 +1152,21 @@
             font-weight: 500;
         }
 
+        .footer-links button {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font-size: 0.95rem;
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
         .footer-links a:hover {
+            color: #ff3f86;
+        }
+
+        .footer-links button:hover {
             color: #ff3f86;
         }
 
@@ -1282,7 +1305,7 @@
                 </div>
             </form>
             <div class="top-nav-actions">
-                <div class="dropdown">
+                <div class="dropdown d-flex align-items-center gap-2">
                     @php
                         $displayName = Auth::user()->full_name ?? Auth::user()->name;
                         $avatarImage = Auth::user()->avatar_image ?? '';
@@ -1290,8 +1313,10 @@
                             ? (str_starts_with($avatarImage, 'http://') || str_starts_with($avatarImage, 'https://') ? $avatarImage : asset('images/'.$avatarImage))
                             : 'https://ui-avatars.com/api/?background=ffffff&color=111827&name='.urlencode($displayName);
                     @endphp
-                    <button class="btn dropdown-toggle user-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a href="{{ route('profile.edit') }}" class="user-avatar-link" data-profile-link>
                         <img src="{{ $avatarSrc }}" alt="{{ $displayName }}" class="user-menu-avatar" onerror="this.src='https://ui-avatars.com/api/?background=ffffff&color=111827&name={{ urlencode($displayName) }}'">
+                    </a>
+                    <button class="btn dropdown-toggle user-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="user-menu-name">{{ $displayName }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end user-menu-dropdown">
@@ -1482,33 +1507,33 @@
                     <div class="footer-brand">MusicApp</div>
                     <p class="footer-text">Thế giới âm nhạc trong tầm tay. Nghe nhạc chất lượng cao, cập nhật xu hướng mới nhất mỗi ngày.</p>
                     <div class="footer-socials">
-                        <a href="#" class="footer-social" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="footer-social" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="footer-social" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 footer-col">
                     <h6 class="footer-heading">Khám Phá</h6>
                     <ul class="footer-links">
-                        <li><a href="{{ route('dashboard') }}">Trang chủ</a></li>
-                        <li><a href="{{ route('dashboard.songs') }}">Bài hát mới</a></li>
-                        <li><a href="{{ route('dashboard.albums') }}">Album Hot</a></li>
-                        <li><a href="{{ route('dashboard.artists') }}">Nghệ sĩ</a></li>
+                        <li><a href="{{ route('dashboard') }}" data-footer-link>Trang chủ</a></li>
+                        <li><a href="{{ route('dashboard.songs') }}" data-footer-link>Bài hát mới</a></li>
+                        <li><a href="{{ route('dashboard.albums') }}" data-footer-link>Album Hot</a></li>
+                        <li><a href="{{ route('dashboard.artists') }}" data-footer-link>Nghệ sĩ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6 footer-col">
                     <h6 class="footer-heading">Hỗ Trợ</h6>
                     <ul class="footer-links">
-                        <li><a href="#">Điều khoản</a></li>
-                        <li><a href="#">Bảo mật</a></li>
-                        <li><a href="#">Liên hệ</a></li>
-                        <li><a href="#">Góp ý</a></li>
+                        <li><button type="button" data-footer-help="Điều khoản">Điều khoản</button></li>
+                        <li><button type="button" data-footer-help="Bảo mật">Bảo mật</button></li>
+                        <li><button type="button" data-footer-help="Liên hệ">Liên hệ</button></li>
+                        <li><button type="button" data-footer-help="Góp ý">Góp ý</button></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 col-md-6 footer-col">
                     <h6 class="footer-heading">Đăng Ký Nhận Tin</h6>
-                    <form class="footer-subscribe" action="#" method="post" onsubmit="event.preventDefault();">
-                        <input type="email" placeholder="Email của bạn..." aria-label="Email đăng ký">
+                    <form class="footer-subscribe" id="footer-subscribe-form" action="#" method="post">
+                        <input type="email" id="footer-subscribe-email" placeholder="Email của bạn..." aria-label="Email đăng ký">
                         <button type="submit" aria-label="Gửi đăng ký"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
@@ -3273,6 +3298,48 @@
             });
 
             document.addEventListener('click', function (event) {
+                const footerLink = event.target.closest('[data-footer-link]');
+
+                if (!footerLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(footerLink.href)
+                    .catch(function () {
+                        window.location.href = footerLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const footerHelp = event.target.closest('[data-footer-help]');
+
+                if (!footerHelp) {
+                    return;
+                }
+
+                event.preventDefault();
+                const topic = footerHelp.getAttribute('data-footer-help') || 'Mục này';
+                showToast(`${topic} dang cap nhat`, 'info');
+            });
+
+            document.addEventListener('click', function (event) {
+                const profileLink = event.target.closest('[data-profile-link]');
+
+                if (!profileLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(profileLink.href)
+                    .catch(function () {
+                        window.location.href = profileLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
                 const leaderboardLink = event.target.closest('[data-leaderboard-link]');
 
                 if (!leaderboardLink) {
@@ -4026,6 +4093,26 @@
                         playlistNewNameInput.value = '';
                         playlistNewNameInput.classList.add('d-none');
                     }
+                });
+            }
+
+            const footerSubscribeForm = document.getElementById('footer-subscribe-form');
+            const footerSubscribeEmail = document.getElementById('footer-subscribe-email');
+
+            if (footerSubscribeForm && footerSubscribeEmail) {
+                footerSubscribeForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const email = String(footerSubscribeEmail.value || '').trim();
+                    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+                    if (!isValidEmail) {
+                        showToast('Vui long nhap email hop le', 'error');
+                        return;
+                    }
+
+                    footerSubscribeEmail.value = '';
+                    showToast('Dang ky nhan tin thanh cong', 'success');
                 });
             }
 
