@@ -134,7 +134,16 @@
         .news-home-card {
             background: #f3f4f6;
             border-radius: 16px;
+            border: 1px solid transparent;
             overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .news-home-card:hover,
+        .news-home-card:focus-within {
+            border-color: #ff3f86;
+            box-shadow: 0 12px 24px rgba(255, 63, 134, 0.16);
+            transform: translateY(-1px);
         }
 
         .news-home-image {
@@ -175,6 +184,16 @@
             padding: 9px 24px;
             font-weight: 700;
             font-size: 1.02rem;
+            background: #ff3f86;
+            border-color: #ff3f86;
+            color: #fff;
+        }
+
+        .news-home-btn:hover,
+        .news-home-btn:focus {
+            background: #e11d70;
+            border-color: #e11d70;
+            color: #fff;
         }
 
         @media (max-width: 991.98px) {
@@ -231,7 +250,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="section-title m-0">Thịnh Hành</h2>
-        <a href="#" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Xem tất cả</a>
+        <a href="{{ route('dashboard.leaderboard') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-leaderboard-link>Xem tất cả</a>
     </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
         @foreach($trending as $song)
@@ -284,7 +303,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="section-title m-0">Mới Phát Hành</h2>
-        <a href="#" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Xem tất cả</a>
+        <a href="{{ route('dashboard.new-releases') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-new-releases-link>Xem tất cả</a>
     </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
         @foreach($newest_songs as $song)
@@ -349,7 +368,7 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
             @foreach($albums as $al)
             <div class="col">
-                <a href="{{ route('dashboard.albums', ['album_id' => $al->album_id]) }}" class="album-feature-card">
+                <a href="{{ route('dashboard.albums', ['album_id' => $al->album_id]) }}" class="album-feature-card" data-album-link>
                     <div class="album-feature-media">
                         <img src="{{ asset('images/'.$al->cover_image) }}" alt="{{ $al->album_name }}" onerror="this.src='https://via.placeholder.com/400'">
                         <div class="album-feature-overlay">
@@ -374,11 +393,11 @@
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
             @foreach($artists_list as $art)
             <div class="col artist-feature-item">
-                <a href="{{ route('dashboard.artists', ['artist_id' => $art->artist_id]) }}" class="artist-feature-link text-decoration-none d-inline-block" title="{{ $art->artist_name }}">
+                <a href="{{ route('dashboard.artists', ['artist_id' => $art->artist_id]) }}" class="artist-feature-link text-decoration-none d-inline-block" title="{{ $art->artist_name }}" data-artist-link>
                     <img src="{{ asset('images/'.$art->avatar_image) }}" class="artist-feature-avatar" alt="{{ $art->artist_name }}" onerror="this.src='https://via.placeholder.com/130'">
                     <div class="artist-feature-name text-truncate">{{ $art->artist_name }}</div>
                 </a>
-                <a href="{{ route('dashboard.albums', ['artist_id' => $art->artist_id]) }}" class="artist-feature-album-link">Xem album</a>
+                <a href="{{ route('dashboard.albums', ['artist_id' => $art->artist_id]) }}" class="artist-feature-album-link" data-album-link>Xem album</a>
             </div>
             @endforeach
         </div>
@@ -409,7 +428,7 @@
                                 <div class="news-home-meta"><i class="fas fa-calendar-alt me-2"></i>{{ !empty($item->event_date) ? date('d/m/Y', strtotime($item->event_date)) : (!empty($item->created_at) ? date('d/m/Y', strtotime($item->created_at)) : 'Đang cập nhật') }}</div>
                                 <div class="news-home-meta"><i class="fas fa-map-marker-alt me-2"></i>{{ $item->location ?? 'Địa điểm đang cập nhật' }}</div>
                                 <div>
-                                    <a href="{{ route('dashboard.news') }}" class="btn btn-primary news-home-btn">Xem chi tiết</a>
+                                    <a href="{{ route('dashboard.news.detail', ['newsId' => $item->news_id]) }}" class="btn news-home-btn" data-news-detail-link>Xem chi tiết</a>
                                 </div>
                             </div>
                         </div>

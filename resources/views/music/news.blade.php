@@ -40,8 +40,13 @@
         }
 
         .news-detail-image {
-            max-height: 430px;
+            max-height: 420px;
             object-fit: cover;
+            width: min(100%, 860px);
+            margin: 0 auto;
+            display: block;
+            image-rendering: auto;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
         }
 
         .news-detail-content {
@@ -124,6 +129,10 @@
                     'Echo Frame (Synthwave)',
                 ];
             }
+
+            $detailImageSrc = !empty($selected_news->image_url)
+                ? $selected_news->image_url
+                : asset('images/'.($selected_news->new_image ?? 'banner.png'));
         @endphp
 
         <div class="mb-3 d-flex align-items-center gap-2">
@@ -150,10 +159,12 @@
 
         <div class="mb-4">
             <img
-                src="{{ asset('images/'.($selected_news->new_image ?? 'banner.png')) }}"
+                src="{{ $detailImageSrc }}"
                 onerror="this.src='https://via.placeholder.com/1200x560'"
                 alt="{{ $selected_news->title ?? 'News detail' }}"
                 class="w-100 rounded-4 news-detail-image"
+                loading="eager"
+                decoding="async"
             >
         </div>
 
@@ -216,13 +227,14 @@
             <hr class="my-5">
 
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-2">
-                <a href="{{ route('dashboard.news') }}" class="btn news-back-btn px-4 py-2">
+                <a href="{{ route('dashboard.news') }}" class="btn news-back-btn px-4 py-2" data-news-detail-link>
                     <i class="fas fa-arrow-left me-2"></i>Trở về
                 </a>
                 <button
                     type="button"
                     class="btn news-share-btn px-4 py-2"
-                    onclick="if (navigator.share) { navigator.share({ title: '{{ addslashes($selected_news->title ?? 'Tin tuc') }}', text: 'Xem bai viet nay', url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); alert('Da sao chep lien ket bai viet'); }"
+                    data-share-article
+                    data-share-title="{{ e($selected_news->title ?? 'Tin tuc') }}"
                 >
                     Chia sẻ bài viết <i class="fas fa-share-alt ms-2"></i>
                 </button>
@@ -252,7 +264,7 @@
                                     {{ !empty($item->event_date) ? date('d/m/Y', strtotime($item->event_date)) : (!empty($item->created_at) ? date('d/m/Y H:i', strtotime($item->created_at)) : '') }}
                                 </div>
                                 <p class="mb-3 text-secondary">{{ \Illuminate\Support\Str::limit(strip_tags($item->description ?? ''), 220) }}</p>
-                                <a href="{{ route('dashboard.news.detail', ['newsId' => $item->news_id]) }}" class="btn btn-primary rounded-pill px-4 news-detail-btn">Xem chi tiết</a>
+                                <a href="{{ route('dashboard.news.detail', ['newsId' => $item->news_id]) }}" class="btn btn-primary rounded-pill px-4 news-detail-btn" data-news-detail-link>Xem chi tiết</a>
                             </div>
                         </div>
                     </div>

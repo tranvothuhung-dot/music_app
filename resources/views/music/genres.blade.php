@@ -27,6 +27,14 @@
     </style>
 
     @if(!empty($selected_genre))
+        <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <a href="{{ route('dashboard.genres') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-genre-list-link>
+                    <i class="fas fa-arrow-left me-1"></i> Trở về
+                </a>
+            </div>
+        </div>
+
         <div class="row g-4 mb-4">
             <div class="col-lg-4 col-12">
                 <div class="card custom-card h-100 p-3">
@@ -101,7 +109,7 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4 mb-4">
             @forelse($genres as $genre)
                 <div class="col">
-                    <a href="{{ route('dashboard.genres', ['genre_id' => $genre->genre_id]) }}" class="genre-card-link text-decoration-none text-reset d-block">
+                    <a href="{{ route('dashboard.genres', ['genre_id' => $genre->genre_id]) }}" class="genre-card-link text-decoration-none text-reset d-block" data-genre-link>
                         <div class="genre-card card custom-card h-100 border-0">
                             <div class="card-body d-flex align-items-center justify-content-center">
                                 <h3 class="genre-card-name m-0 fw-bold">{{ $genre->genre_name }}</h3>

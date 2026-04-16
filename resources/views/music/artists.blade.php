@@ -17,6 +17,14 @@
     </style>
 
     @if(!empty($selected_artist))
+        <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <a href="{{ route('dashboard.artists') }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-artist-list-link>
+                    <i class="fas fa-arrow-left me-1"></i> Trở về
+                </a>
+            </div>
+        </div>
+
         <div class="row g-4 mb-4">
             <div class="col-lg-4 col-12">
                 <div class="card custom-card h-100 p-3">
@@ -27,6 +35,17 @@
                         <h3 class="fw-bold mb-1">{{ $selected_artist->artist_name }}</h3>
                         <div class="text-primary fw-semibold">Nghệ sĩ</div>
                     </div>
+                    @if($artist_songs->isNotEmpty())
+                        <button
+                            type="button"
+                            class="btn btn-primary rounded-pill fw-bold mt-4"
+                            style="background: #f83f86; border: 0;"
+                            data-play-all-songs
+                            data-song-ids='@json($artist_songs->pluck("song_id")->values())'
+                        >
+                            <i class="fas fa-play me-2"></i>Phát Tất Cả
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -82,7 +101,7 @@
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-5 g-4 mb-4">
             @forelse($artists as $artist)
                 <div class="col text-center">
-                    <a href="{{ route('dashboard.artists', ['artist_id' => $artist->artist_id]) }}" class="artist-circle-link text-decoration-none text-reset d-inline-block" title="{{ $artist->artist_name }}">
+                    <a href="{{ route('dashboard.artists', ['artist_id' => $artist->artist_id]) }}" class="artist-circle-link text-decoration-none text-reset d-inline-block" title="{{ $artist->artist_name }}" data-artist-link>
                         <img
                             src="{{ asset('images/'.$artist->avatar_image) }}"
                             onerror="this.src='https://via.placeholder.com/120'"

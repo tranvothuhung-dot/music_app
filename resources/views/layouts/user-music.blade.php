@@ -10,7 +10,8 @@
         :root { --primary-color: #ff4081; }
         .text-primary { color: var(--primary-color) !important; }
         .bg-primary { background-color: var(--primary-color) !important; }
-        body { padding-bottom: 150px !important; }
+        body { padding-bottom: 20px !important; }
+        body.has-player-bar { padding-bottom: 150px !important; }
         
         /* Layout & Card */
         .sidebar-sticky {
@@ -732,12 +733,16 @@
         .player-control-btn {
             border: 0;
             background: transparent;
-            color: #222;
+            color: #111827;
             font-size: 1rem;
             width: 36px;
             height: 36px;
             border-radius: 50%;
             transition: 0.2s ease;
+        }
+
+        .player-control-btn.is-active {
+            color: var(--primary-color);
         }
 
         .player-control-btn:hover {
@@ -758,6 +763,48 @@
 
         .player-volume {
             accent-color: var(--primary-color);
+        }
+
+        .player-volume::-webkit-slider-runnable-track {
+            background: linear-gradient(
+                90deg,
+                #ff3f86 0%,
+                #ff3f86 var(--volume-progress, 80%),
+                #d1d5db var(--volume-progress, 80%),
+                #d1d5db 100%
+            );
+            height: 6px;
+            border-radius: 999px;
+        }
+
+        .player-volume::-webkit-slider-thumb {
+            background: #ff3f86;
+            border: 0;
+            width: 14px;
+            height: 14px;
+            margin-top: -4px;
+            border-radius: 50%;
+        }
+
+        .player-volume::-moz-range-track {
+            background: #d1d5db;
+            height: 6px;
+            border: 0;
+            border-radius: 999px;
+        }
+
+        .player-volume::-moz-range-progress {
+            background: #ff3f86;
+            height: 6px;
+            border-radius: 999px;
+        }
+
+        .player-volume::-moz-range-thumb {
+            background: #ff3f86;
+            border: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
         }
 
         .player-seekbar {
@@ -924,7 +971,7 @@
         }
 
         .user-menu-toggle::after {
-            color: #2563eb;
+            color: #ff3f86;
             margin-left: 2px;
         }
 
@@ -1026,20 +1073,21 @@
         }
 
         .site-footer {
-            margin-top: 28px;
-            padding: 42px 0 120px;
+            margin-top: 24px;
+            padding: 36px 0 34px;
             border-top: 1px solid #dfe3eb;
             color: #374151;
         }
 
         .footer-brand {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: #111827;
             margin-bottom: 10px;
         }
 
         .footer-text {
+            font-size: 0.95rem;
             color: #4b5563;
             line-height: 1.6;
             max-width: 340px;
@@ -1070,7 +1118,7 @@
         }
 
         .footer-heading {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             color: #111827;
             margin-bottom: 10px;
@@ -1089,6 +1137,7 @@
         }
 
         .footer-links a {
+            font-size: 0.95rem;
             color: #4b5563;
             text-decoration: none;
             font-weight: 500;
@@ -1123,6 +1172,7 @@
         }
 
         .footer-bottom {
+            font-size: 0.92rem;
             margin-top: 28px;
             padding-top: 16px;
             border-top: 1px solid #dfe3eb;
@@ -1188,7 +1238,7 @@
 
         @media (max-width: 991.98px) {
             .site-footer {
-                padding-bottom: 150px;
+                padding-bottom: 26px;
             }
 
             .footer-col {
@@ -1197,7 +1247,15 @@
         }
     </style>
 </head>
-<body class="bg-light pb-5 mb-5">
+<body class="bg-light">
+    @php
+        $count_liked = $count_liked ?? 0;
+        $liked_songs = $liked_songs ?? collect();
+        $history_list = $history_list ?? collect();
+        $my_playlists = $my_playlists ?? collect();
+        $playlist_songs_map = $playlist_songs_map ?? collect();
+        $js_data = $js_data ?? ['queue' => []];
+    @endphp
 
     <nav class="navbar navbar-expand-lg sticky-top bg-white shadow-sm py-3 mb-4">
         <div class="container-fluid px-4 top-nav-inner">
@@ -1243,9 +1301,9 @@
                             </a>
                         </li>
                         <li>
-                            <button type="button" class="user-menu-item" data-open-liked>
+                            <a href="{{ route('dashboard.favorites') }}" class="user-menu-item" data-favorites-link>
                                 <i class="fas fa-heart text-danger"></i>Yêu thích
-                            </button>
+                            </a>
                         </li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}" class="user-menu-form">
@@ -1545,6 +1603,7 @@
             const csrfToken = @json(csrf_token());
             const playbackStateKey = 'musicapp.playbackState';
             const playbackStateWindowKey = '__musicapp_playback_state__';
+            const queueStateKey = 'musicapp.queueState';
 
             const audio = document.getElementById('music-audio');
             const playerBar = document.getElementById('player-bar');
@@ -1582,7 +1641,7 @@
 
             let currentIndex = 0;
             let shuffleEnabled = false;
-            let repeatMode = 'all';
+            let repeatMode = 'off';
             let toastTimer = null;
             let lastHistorySongId = null;
             let lastHistoryRecordedAt = 0;
@@ -1597,6 +1656,30 @@
                 }
 
                 playerBar.classList.remove('is-hidden');
+                document.body.classList.add('has-player-bar');
+            }
+
+            function hidePlayerBar() {
+                if (!playerBar) {
+                    return;
+                }
+
+                playerBar.classList.add('is-hidden');
+                document.body.classList.remove('has-player-bar');
+            }
+
+            function resetPlayerState() {
+                audio.pause();
+                audio.removeAttribute('src');
+                title.textContent = 'Chọn bài hát';
+                artist.textContent = '...';
+                cover.src = @json(asset('images/default_song.png'));
+                playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+                currentTimeLabel.textContent = '0:00';
+                durationLabel.textContent = '0:00';
+                setSeekVisual(0);
+                currentIndex = 0;
+                updateActiveStates(0);
             }
 
             function showToast(message, type = 'info') {
@@ -1623,6 +1706,24 @@
                 toastTimer = window.setTimeout(function () {
                     actionToast.classList.remove('show');
                 }, 1800);
+            }
+
+            function updateVolumeVisual(value) {
+                if (!volumeRange) {
+                    return;
+                }
+
+                const min = Number(volumeRange.min || 0);
+                const max = Number(volumeRange.max || 100);
+                const current = Number(value);
+
+                if (!Number.isFinite(current) || max <= min) {
+                    return;
+                }
+
+                const clamped = Math.min(max, Math.max(min, current));
+                const percent = ((clamped - min) / (max - min)) * 100;
+                volumeRange.style.setProperty('--volume-progress', `${percent}%`);
             }
 
             function buildSongLink(songId) {
@@ -1684,6 +1785,92 @@
                 });
             }
 
+            function normalizeSongForStorage(song) {
+                if (!song) {
+                    return null;
+                }
+
+                const songId = Number(song.song_id || 0);
+
+                if (!songId) {
+                    return null;
+                }
+
+                return {
+                    song_id: songId,
+                    song_name: String(song.song_name || ''),
+                    artist_name: String(song.artist_name || ''),
+                    song_image: String(song.song_image || ''),
+                    song_url: String(song.song_url || ''),
+                    duration: Number(song.duration || 0),
+                    album_id: Number(song.album_id || 0),
+                    artist_id: Number(song.artist_id || 0),
+                };
+            }
+
+            function saveQueueState() {
+                const normalizedQueue = songs
+                    .map(normalizeSongForStorage)
+                    .filter(function (song) {
+                        return !!song;
+                    });
+
+                try {
+                    sessionStorage.setItem(queueStateKey, JSON.stringify(normalizedQueue));
+                } catch (error) {}
+            }
+
+            function clearQueueState() {
+                try {
+                    sessionStorage.removeItem(queueStateKey);
+                } catch (error) {}
+            }
+
+            function restoreQueueState() {
+                let rawState = '';
+
+                try {
+                    rawState = sessionStorage.getItem(queueStateKey) || '';
+                } catch (error) {}
+
+                if (!rawState) {
+                    return;
+                }
+
+                let parsedState = null;
+
+                try {
+                    parsedState = JSON.parse(rawState);
+                } catch (error) {
+                    parsedState = null;
+                }
+
+                if (!Array.isArray(parsedState) || parsedState.length === 0) {
+                    return;
+                }
+
+                songs.length = 0;
+                parsedState.forEach(function (song) {
+                    const normalizedSong = normalizeSongForStorage(song);
+
+                    if (normalizedSong) {
+                        songs.push(normalizedSong);
+                    }
+                });
+
+                if (queueSongsList) {
+                    queueSongsList.innerHTML = '';
+
+                    songs.forEach(function (song) {
+                        const button = createSidebarSongButton(song, 'queue', queueSongsList.children.length);
+                        queueSongsList.insertBefore(button, queueSongsList.firstChild);
+                    });
+                }
+
+                refreshQueueOrderLabels();
+                refreshSidebarEmptyStates();
+            }
+
             function ensureSongInQueue(song) {
                 const existingIndex = getSongIndex(song.song_id);
 
@@ -1692,6 +1879,7 @@
                 }
 
                 songs.push(song);
+                saveQueueState();
 
                 return { index: songs.length - 1, added: true };
             }
@@ -1709,6 +1897,8 @@
                 songCatalog.forEach(function (song) {
                     songs.push(song);
                 });
+
+                saveQueueState();
 
                 if (currentIndex < 0 || currentIndex >= songs.length) {
                     currentIndex = 0;
@@ -2040,6 +2230,85 @@
                 refreshSidebarEmptyStates();
             }
 
+            function refreshFavoritesPageState() {
+                const favoritesList = document.getElementById('favorites-page-songs-list');
+                const favoritesEmpty = document.getElementById('favorites-page-empty');
+
+                if (!favoritesList) {
+                    return;
+                }
+
+                favoritesList.querySelectorAll('[data-favorite-page-item]').forEach(function (item, index) {
+                    const indexLabel = item.querySelector('[data-favorite-page-index]');
+
+                    if (indexLabel) {
+                        indexLabel.textContent = String(index + 1);
+                    }
+                });
+
+                if (favoritesEmpty) {
+                    favoritesEmpty.classList.toggle('d-none', favoritesList.children.length > 0);
+                }
+            }
+
+            function addSongToFavoritesPageList(song) {
+                const favoritesList = document.getElementById('favorites-page-songs-list');
+
+                if (!favoritesList || !song || !song.song_id) {
+                    return;
+                }
+
+                const existing = favoritesList.querySelector(`[data-favorite-page-item][data-song-id="${song.song_id}"]`);
+
+                if (existing) {
+                    existing.remove();
+                }
+
+                const item = document.createElement('div');
+                item.className = 'queue-song d-flex align-items-center gap-3 mb-2';
+                item.setAttribute('data-favorite-page-item', '');
+                item.setAttribute('data-song-card', '');
+                item.dataset.songId = String(song.song_id);
+                item.dataset.songName = String(song.song_name || '');
+                item.dataset.songArtist = String(song.artist_name || '');
+                item.dataset.songImage = `${@json(asset('images'))}/${song.song_image || 'default_song.png'}`;
+                item.dataset.songUrl = String(song.song_url || '');
+                item.dataset.songDuration = String(Number(song.duration || 0));
+                item.dataset.songAlbumId = String(Number(song.album_id || 0));
+                item.dataset.songArtistId = String(Number(song.artist_id || 0));
+
+                item.innerHTML = `
+                    <span class="fw-bold text-muted" style="width: 26px;" data-favorite-page-index>1</span>
+                    <img src="${@json(asset('images'))}/${song.song_image || 'default_song.png'}" width="44" height="44" class="rounded object-fit-cover" alt="${song.song_name || 'Song'}" onerror="this.src='https://via.placeholder.com/44'">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="fw-bold text-truncate">${song.song_name || 'Unknown'}</div>
+                        <div class="text-muted text-truncate">${song.artist_name || ''}</div>
+                    </div>
+                    <button class="btn btn-link text-secondary p-0 btn-song-menu" type="button" data-action="like" data-song-id="${song.song_id}" data-like-icon-only title="Xóa khỏi yêu thích">
+                        <i class="fas fa-heart-crack text-danger"></i>
+                    </button>
+                `;
+
+                favoritesList.insertBefore(item, favoritesList.firstChild);
+                refreshFavoritesPageState();
+            }
+
+            function removeSongFromFavoritesPageList(songId) {
+                const favoritesList = document.getElementById('favorites-page-songs-list');
+
+                if (!favoritesList) {
+                    return;
+                }
+
+                const item = favoritesList.querySelector(`[data-favorite-page-item][data-song-id="${Number(songId)}"]`);
+
+                if (item) {
+                    item.remove();
+                }
+
+                refreshFavoritesPageState();
+            }
+
             function refreshLikeActionButtons(songId = null) {
                 const selector = songId
                     ? `[data-action="like"][data-song-id="${Number(songId)}"]`
@@ -2047,6 +2316,14 @@
 
                 document.querySelectorAll(selector).forEach(function (button) {
                     const liked = likedSongIds.has(Number(button.dataset.songId));
+
+                    if (button.hasAttribute('data-like-icon-only')) {
+                        button.innerHTML = liked
+                            ? '<i class="fas fa-heart-crack text-danger"></i>'
+                            : '<i class="fas fa-heart text-danger"></i>';
+                        button.setAttribute('title', liked ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích');
+                        return;
+                    }
 
                     button.innerHTML = liked
                         ? '<i class="fas fa-heart-crack me-2 text-danger"></i> Xóa khỏi yêu thích'
@@ -2075,26 +2352,19 @@
                 }
 
                 if (songs.length === 0) {
-                    audio.pause();
-                    audio.removeAttribute('src');
-                    title.textContent = 'Chọn bài hát';
-                    artist.textContent = '...';
-                    cover.src = @json(asset('images/default_song.png'));
-                    playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-                    currentIndex = 0;
-                    updateActiveStates(0);
+                    resetPlayerState();
+                    hidePlayerBar();
+                    clearPersistedPlaybackState();
+                    clearQueueState();
                     refreshQueueOrderLabels();
                     refreshSidebarEmptyStates();
                     return;
                 }
 
-                if (queueIndex < currentIndex) {
-                    currentIndex -= 1;
-                } else if (queueIndex === currentIndex) {
-                    const nextIndex = Math.min(queueIndex, songs.length - 1);
-                    updatePlayer(songs[nextIndex], !audio.paused);
-                }
-
+                resetPlayerState();
+                hidePlayerBar();
+                clearPersistedPlaybackState();
+                saveQueueState();
                 refreshQueueOrderLabels();
                 refreshSidebarEmptyStates();
             }
@@ -2106,18 +2376,10 @@
                     queueSongsList.innerHTML = '';
                 }
 
-                audio.pause();
-                audio.removeAttribute('src');
-                title.textContent = 'Chọn bài hát';
-                artist.textContent = '...';
-                cover.src = @json(asset('images/default_song.png'));
-                playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-                currentTimeLabel.textContent = '0:00';
-                durationLabel.textContent = '0:00';
-                setSeekVisual(0);
-                currentIndex = 0;
-
-                updateActiveStates(0);
+                resetPlayerState();
+                hidePlayerBar();
+                clearPersistedPlaybackState();
+                clearQueueState();
                 refreshQueueOrderLabels();
                 refreshSidebarEmptyStates();
             }
@@ -2432,10 +2694,10 @@
             }
 
             function updateControlStates() {
-                shuffleButton.classList.toggle('text-primary', shuffleEnabled);
+                shuffleButton.classList.toggle('is-active', shuffleEnabled);
 
                 repeatButton.innerHTML = '<i class="fas fa-rotate-right"></i>';
-                repeatButton.classList.toggle('text-primary', repeatMode !== 'off');
+                repeatButton.classList.toggle('is-active', repeatMode !== 'off');
                 repeatButton.title = repeatMode === 'one' ? 'Lặp lại 1 bài' : (repeatMode === 'all' ? 'Lặp lại tất cả' : 'Tắt lặp lại');
             }
 
@@ -2525,6 +2787,38 @@
                 } catch (error) {}
             }
 
+            function clearPersistedPlaybackState() {
+                try {
+                    sessionStorage.removeItem(playbackStateKey);
+                } catch (error) {}
+
+                try {
+                    const winName = String(window.name || '');
+
+                    if (winName.startsWith(playbackStateWindowKey)) {
+                        window.name = '';
+                    }
+                } catch (error) {}
+            }
+
+            function isReloadNavigation() {
+                try {
+                    const entries = window.performance && window.performance.getEntriesByType
+                        ? window.performance.getEntriesByType('navigation')
+                        : [];
+
+                    if (entries && entries[0] && entries[0].type) {
+                        return entries[0].type === 'reload';
+                    }
+
+                    if (window.performance && window.performance.navigation) {
+                        return window.performance.navigation.type === 1;
+                    }
+                } catch (error) {}
+
+                return false;
+            }
+
             function getPersistedPlaybackStateRaw() {
                 let rawState = '';
 
@@ -2548,6 +2842,8 @@
             }
 
             function restorePlaybackState() {
+                const reloadedPage = isReloadNavigation();
+
                 const rawState = getPersistedPlaybackStateRaw();
 
                 if (!rawState) {
@@ -2598,11 +2894,12 @@
                     audio.volume = restoreVolume;
                     if (volumeRange) {
                         volumeRange.value = String(Math.round(restoreVolume * 100));
+                        updateVolumeVisual(volumeRange.value);
                     }
                 }
 
                 const resumeAt = Number(state.current_time || 0);
-                const shouldPlay = state.paused === false;
+                const shouldPlay = !reloadedPage && state.paused === false;
 
                 const applyResumeState = function () {
                     const finishRestore = function () {
@@ -2809,6 +3106,7 @@
                 }
 
                 updateControlStates();
+                savePlaybackState();
             }
 
             function bindSongCardClicks(scope = document) {
@@ -2899,6 +3197,210 @@
                     });
             });
 
+            document.addEventListener('click', function (event) {
+                const newsDetailLink = event.target.closest('[data-news-detail-link]');
+
+                if (!newsDetailLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(newsDetailLink.href)
+                    .catch(function () {
+                        window.location.href = newsDetailLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const albumLink = event.target.closest('[data-album-link]');
+
+                if (!albumLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(albumLink.href)
+                    .catch(function () {
+                        window.location.href = albumLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const artistLink = event.target.closest('[data-artist-link]');
+
+                if (!artistLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(artistLink.href)
+                    .catch(function () {
+                        window.location.href = artistLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const genreLink = event.target.closest('[data-genre-link]');
+
+                if (!genreLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(genreLink.href)
+                    .catch(function () {
+                        window.location.href = genreLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const favoritesLink = event.target.closest('[data-favorites-link]');
+
+                if (!favoritesLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(favoritesLink.href)
+                    .catch(function () {
+                        window.location.href = favoritesLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const leaderboardLink = event.target.closest('[data-leaderboard-link]');
+
+                if (!leaderboardLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(leaderboardLink.href)
+                    .catch(function () {
+                        window.location.href = leaderboardLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const homeLink = event.target.closest('[data-home-link]');
+
+                if (!homeLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(homeLink.href)
+                    .catch(function () {
+                        window.location.href = homeLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const newReleasesLink = event.target.closest('[data-new-releases-link]');
+
+                if (!newReleasesLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(newReleasesLink.href)
+                    .catch(function () {
+                        window.location.href = newReleasesLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const albumListLink = event.target.closest('[data-album-list-link]');
+
+                if (!albumListLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(albumListLink.href)
+                    .catch(function () {
+                        window.location.href = albumListLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const artistListLink = event.target.closest('[data-artist-list-link]');
+
+                if (!artistListLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(artistListLink.href)
+                    .catch(function () {
+                        window.location.href = artistListLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const genreListLink = event.target.closest('[data-genre-list-link]');
+
+                if (!genreListLink) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                loadTopMenuContent(genreListLink.href)
+                    .catch(function () {
+                        window.location.href = genreListLink.href;
+                    });
+            });
+
+            document.addEventListener('click', function (event) {
+                const shareArticleButton = event.target.closest('[data-share-article]');
+
+                if (!shareArticleButton) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const shareTitle = shareArticleButton.dataset.shareTitle || 'Tin tuc';
+                const shareUrl = window.location.href;
+
+                if (navigator.share) {
+                    navigator.share({
+                        title: shareTitle,
+                        text: 'Xem bai viet nay',
+                        url: shareUrl,
+                    }).then(function () {
+                        showToast('Da chia se bai viet', 'success');
+                    }).catch(function () {
+                        showToast('Khong the chia se bai viet', 'error');
+                    });
+                    return;
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(shareUrl)
+                        .then(function () {
+                            showToast('Da sao chep lien ket bai viet', 'success');
+                        })
+                        .catch(function () {
+                            showToast('Khong the sao chep lien ket', 'error');
+                        });
+                    return;
+                }
+
+                showToast('Trinh duyet khong ho tro chia se', 'info');
+            });
+
             window.addEventListener('popstate', function () {
                 loadTopMenuContent(window.location.href, false).catch(function () {});
             });
@@ -2937,30 +3439,43 @@
 
                 event.preventDefault();
 
-                let songIds = [];
+                let songIdsFromButton = [];
 
                 try {
-                    songIds = JSON.parse(playAllButton.dataset.songIds || '[]');
+                    songIdsFromButton = JSON.parse(playAllButton.dataset.songIds || '[]');
                 } catch (error) {
-                    songIds = [];
+                    songIdsFromButton = [];
                 }
 
-                if (!Array.isArray(songIds) || songIds.length === 0) {
+                const listContainer = playAllButton.closest('.row, .col-lg-4, .col-lg-8, .card, .container, .container-fluid') || document;
+                const songIdsFromVisibleList = Array.from(listContainer.querySelectorAll('[data-song-card][data-song-id]'))
+                    .map(function (item) {
+                        return Number(item.dataset.songId || 0);
+                    })
+                    .filter(function (songId) {
+                        return Number.isFinite(songId) && songId > 0;
+                    });
+
+                const orderedSongIds = (songIdsFromVisibleList.length ? songIdsFromVisibleList : songIdsFromButton)
+                    .map(function (songId) {
+                        return Number(songId || 0);
+                    })
+                    .filter(function (songId) {
+                        return Number.isFinite(songId) && songId > 0;
+                    });
+
+                const uniqueSongIds = Array.from(new Set(orderedSongIds));
+
+                if (uniqueSongIds.length === 0) {
                     showToast('Khong co bai hat de phat', 'info');
                     return;
                 }
 
-                let firstSongId = null;
-
-                songIds.forEach(function (songId) {
+                uniqueSongIds.forEach(function (songId) {
                     const song = getSongById(songId, playAllButton);
 
                     if (!song) {
                         return;
-                    }
-
-                    if (firstSongId === null) {
-                        firstSongId = Number(song.song_id);
                     }
 
                     const queueResult = ensureSongInQueue(song);
@@ -2969,6 +3484,8 @@
                         addSongToSidebarList(song, 'queue');
                     }
                 });
+
+                const firstSongId = uniqueSongIds[0] || null;
 
                 if (firstSongId !== null) {
                     playSongById(firstSongId, true, playAllButton);
@@ -3011,6 +3528,7 @@
                         if (!data.liked) {
                             likedSongIds.delete(songId);
                             removeSongFromLikedList(songId);
+                            removeSongFromFavoritesPageList(songId);
                             updateLikedCount(Number(data.liked_count));
                             refreshLikeActionButtons(songId);
 
@@ -3181,9 +3699,11 @@
                             if (data.liked) {
                                 likedSongIds.add(Number(songId));
                                 addSongToSidebarList(song, 'liked');
+                                addSongToFavoritesPageList(song);
                             } else {
                                 likedSongIds.delete(Number(songId));
                                 removeSongFromLikedList(songId);
+                                removeSongFromFavoritesPageList(songId);
                             }
 
                             updateLikedCount(Number(data.liked_count));
@@ -3227,22 +3747,24 @@
 
                 if (action === 'album') {
                     const albumId = Number(actionButton.dataset.albumId || actionButton.closest('[data-song-card]')?.dataset.songAlbumId || 0);
+                    const targetUrl = albumId > 0 ? `${albumsPageUrl}?album_id=${albumId}` : albumsPageUrl;
 
-                    if (albumId > 0) {
-                        window.location.href = `${albumsPageUrl}?album_id=${albumId}`;
-                    } else {
-                        window.location.href = albumsPageUrl;
-                    }
+                    loadTopMenuContent(targetUrl)
+                        .catch(function () {
+                            savePlaybackState();
+                            window.location.href = targetUrl;
+                        });
                 }
 
                 if (action === 'artist') {
                     const artistId = Number(actionButton.dataset.artistId || actionButton.closest('[data-song-card]')?.dataset.songArtistId || 0);
+                    const targetUrl = artistId > 0 ? `${artistsPageUrl}?artist_id=${artistId}` : artistsPageUrl;
 
-                    if (artistId > 0) {
-                        window.location.href = `${artistsPageUrl}?artist_id=${artistId}`;
-                    } else {
-                        window.location.href = artistsPageUrl;
-                    }
+                    loadTopMenuContent(targetUrl)
+                        .catch(function () {
+                            savePlaybackState();
+                            window.location.href = targetUrl;
+                        });
                 }
             });
 
@@ -3250,6 +3772,7 @@
             shuffleButton.addEventListener('click', function () {
                 shuffleEnabled = !shuffleEnabled;
                 updateControlStates();
+                savePlaybackState();
             });
             prevButton.addEventListener('click', playPrevious);
             nextButton.addEventListener('click', playNext);
@@ -3273,8 +3796,10 @@
                         updateLikedCount(Number(data.liked_count));
                         if (data.liked) {
                             addSongToSidebarList(songs[currentIndex], 'liked');
+                            addSongToFavoritesPageList(songs[currentIndex]);
                         } else {
                             removeSongFromLikedList(songId);
+                            removeSongFromFavoritesPageList(songId);
                         }
                         refreshLikeActionButtons(songId);
                         updateLikeButton(songs[currentIndex]);
@@ -3336,6 +3861,24 @@
             });
 
             if (seekBar) {
+                const endSeeking = function (event) {
+                    if (!isSeeking) {
+                        return;
+                    }
+
+                    if (event && typeof event.clientX === 'number') {
+                        seekAudioToClientX(event.clientX);
+                    }
+
+                    isSeeking = false;
+
+                    if (event && seekBar.releasePointerCapture && event.pointerId !== undefined) {
+                        try {
+                            seekBar.releasePointerCapture(event.pointerId);
+                        } catch (error) {}
+                    }
+                };
+
                 seekBar.addEventListener('pointerdown', function (event) {
                     event.preventDefault();
                     isSeeking = true;
@@ -3350,7 +3893,7 @@
                 });
 
                 seekBar.addEventListener('pointermove', function (event) {
-                    if (!isSeeking || event.buttons === 0) {
+                    if (!isSeeking) {
                         return;
                     }
 
@@ -3360,19 +3903,13 @@
 
                 seekBar.addEventListener('pointerup', function (event) {
                     event.preventDefault();
-                    seekAudioToClientX(event.clientX);
-                    isSeeking = false;
-
-                    if (seekBar.releasePointerCapture) {
-                        try {
-                            seekBar.releasePointerCapture(event.pointerId);
-                        } catch (error) {}
-                    }
+                    endSeeking(event);
                 });
 
-                seekBar.addEventListener('pointercancel', function () {
-                    isSeeking = false;
-                });
+                seekBar.addEventListener('pointercancel', endSeeking);
+
+                window.addEventListener('pointerup', endSeeking);
+                window.addEventListener('pointercancel', endSeeking);
 
                 seekBar.addEventListener('click', function (event) {
                     seekAudioToClientX(event.clientX);
@@ -3382,6 +3919,7 @@
 
             volumeRange.addEventListener('input', function () {
                 audio.volume = volumeRange.value / 100;
+                updateVolumeVisual(volumeRange.value);
                 savePlaybackState();
             });
 
@@ -3492,6 +4030,8 @@
             }
 
             updateControlStates();
+            updateVolumeVisual(volumeRange.value);
+            restoreQueueState();
             refreshSidebarEmptyStates();
             refreshQueueOrderLabels();
             refreshPlaylistEmptyState();

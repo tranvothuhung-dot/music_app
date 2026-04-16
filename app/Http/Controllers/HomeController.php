@@ -171,6 +171,40 @@ class HomeController extends Controller
         ], $this->dashboardSharedData()));
     }
 
+    public function newReleases()
+    {
+        $newestSongs = DB::table('songs as s')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->leftJoin('genres as g', 's.genre_id', '=', 'g.genre_id')
+            ->select('s.*', 'a.artist_name', 'g.genre_name')
+            ->orderByRaw("COALESCE(g.genre_name, 'Khac') ASC")
+            ->orderByDesc('s.created_at')
+            ->paginate(20);
+
+        $newestSongsByGenre = $newestSongs->getCollection()->groupBy(function ($song) {
+            return $song->genre_name ?: 'Khac';
+        });
+
+        return view('music.new-releases', array_merge([
+            'newest_songs' => $newestSongs,
+            'newest_songs_by_genre' => $newestSongsByGenre,
+        ], $this->dashboardSharedData()));
+    }
+
+    public function leaderboard()
+    {
+        $leaderboardSongs = DB::table('songs as s')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->select('s.*', 'a.artist_name')
+            ->orderByDesc('s.view_count')
+            ->limit(100)
+            ->get();
+
+        return view('music.leaderboard', array_merge([
+            'leaderboard_songs' => $leaderboardSongs,
+        ], $this->dashboardSharedData()));
+    }
+
     public function albums(Request $request)
     {
         $albumId = (int) $request->query('album_id', 0);
@@ -334,6 +368,27 @@ class HomeController extends Controller
         return view('music.news', array_merge([
             'news' => $news,
             'selected_news' => $selectedNews,
+        ], $this->dashboardSharedData()));
+    }
+
+    public function favorites()
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return redirect()->route('dashboard');
+        }
+
+        $favoriteSongs = DB::table('favorites as f')
+            ->join('songs as s', 'f.song_id', '=', 's.song_id')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->select('s.*', 'a.artist_name', 'f.added_at')
+            ->where('f.user_id', $userId)
+            ->orderByDesc('f.added_at')
+            ->get();
+
+        return view('music.favorites', array_merge([
+            'favorite_songs' => $favoriteSongs,
         ], $this->dashboardSharedData()));
     }
 
