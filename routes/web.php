@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -26,11 +27,10 @@ Route::middleware('auth')->group(function () {
             'description' => 'Trang quản lý người dùng sẽ được hiển thị ở đây.',
         ])->name('users.index');
 
-        Route::view('/artists', 'admin.placeholder', [
-            'title' => 'Nghệ Sĩ - Admin',
-            'heading' => 'Nghệ Sĩ',
-            'description' => 'Trang quản lý nghệ sĩ sẽ được hiển thị ở đây.',
-        ])->name('artists.index');
+        Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
+        Route::post('/artists', [ArtistController::class, 'store'])->name('artists.store');
+        Route::put('/artists/{artist}', [ArtistController::class, 'update'])->name('artists.update');
+        Route::delete('/artists/{artist}', [ArtistController::class, 'destroy'])->name('artists.destroy');
 
         Route::view('/albums', 'admin.placeholder', [
             'title' => 'Albums - Admin',
