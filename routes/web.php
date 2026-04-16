@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ArtistController;
+use App\Http\Controllers\Admin\SongController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProfileController;
@@ -44,11 +45,10 @@ Route::middleware('auth')->group(function () {
             'description' => 'Trang quản lý thể loại sẽ được hiển thị ở đây.',
         ])->name('genres.index');
 
-        Route::view('/songs', 'admin.placeholder', [
-            'title' => 'Bài Hát - Admin',
-            'heading' => 'Bài Hát',
-            'description' => 'Trang quản lý bài hát sẽ được hiển thị ở đây.',
-        ])->name('songs.index');
+        Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
+        Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
+        Route::patch('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
+        Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
 
         Route::view('/news', 'admin.placeholder', [
             'title' => 'Tin Tức - Admin',
