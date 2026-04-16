@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -45,6 +46,64 @@ class GenresController extends Controller
 		return view('admin.genres', [
 			'genres' => $genres,
 			'keyword' => $keyword,
+		]);
+	}
+
+	public function songs(int $genre): View
+	{
+		$genreQuery = DB::table('genres')->where('genre_id', $genre);
+
+		if (Schema::hasColumn('genres', 'status')) {
+			$genreQuery->where('status', 1);
+		}
+
+		$genreData = $genreQuery->first();
+
+		if ($genreData === null) {
+			abort(404);
+		}
+
+		$songsQuery = DB::table('songs as s')
+			->leftJoin('artists as a', 's.artist_id', '=', 'a.artist_id')
+			->leftJoin('albums as al', 's.album_id', '=', 'al.album_id')
+			->select(
+				's.song_id',
+				's.song_name',
+				's.song_image',
+				's.song_url',
+				's.duration',
+				's.view_count',
+				'a.artist_name',
+				'al.album_name'
+			)
+			->where('s.genre_id', $genre)
+			->orderBy('s.song_id');
+
+		if (Schema::hasColumn('songs', 'status')) {
+			$songsQuery->where('s.status', 1);
+		}
+
+		$songs = $songsQuery
+			->get()
+			->map(function ($song) {
+				return [
+					'id' => (int) $song->song_id,
+					'title' => (string) ($song->song_name ?? ''),
+					'artist' => (string) ($song->artist_name ?? 'Chưa có ca sĩ'),
+					'album' => (string) ($song->album_name ?? 'Chưa có album'),
+					'duration' => (int) ($song->duration ?? 0),
+					'views' => number_format((int) ($song->view_count ?? 0)),
+					'cover' => $this->resolveSongImageUrl((string) ($song->song_image ?? '')),
+					'audio_src' => $this->resolveSongAudioUrl((string) ($song->song_url ?? '')),
+				];
+			});
+
+		return view('admin.genre-songs', [
+			'genre' => [
+				'id' => (int) $genreData->genre_id,
+				'name' => (string) $genreData->genre_name,
+			],
+			'songs' => $songs,
 		]);
 	}
 
@@ -126,5 +185,61 @@ class GenresController extends Controller
 		return redirect()
 			->route('admin.genres.index')
 			->with('success', 'Đã xóa thể loại thành công.');
+	}
+
+	private function resolveSongImageUrl(string $songImage): string
+	{
+		if ($songImage === '') {
+			return asset('images/song-placeholder.svg');
+		}
+
+		if (str_starts_with($songImage, 'http://') || str_starts_with($songImage, 'https://')) {
+			return $songImage;
+		}
+
+		if (Storage::disk('public')->exists('song_images/' . $songImage)) {
+			return asset('storage/song_images/' . $songImage);
+		}
+
+		if (file_exists(public_path('images/' . $songImage))) {
+			return asset('images/' . $songImage);
+		}
+
+		return asset('images/song-placeholder.svg');
+	}
+
+	private function resolveSongAudioUrl(string $songUrl): string
+	{
+		if ($songUrl === '') {
+			return '';
+		}
+
+		if (str_starts_with($songUrl, 'http://') || str_starts_with($songUrl, 'https://')) {
+			return $songUrl;
+		}
+
+		if (str_starts_with($songUrl, '/')) {
+			return asset(ltrim($songUrl, '/'));
+		}
+
+		if (str_starts_with($songUrl, 'storage/')) {
+			return asset($songUrl);
+		}
+
+		$fileName = basename($songUrl);
+
+		if (Storage::disk('public')->exists('song/' . $fileName)) {
+			return asset('storage/song/' . $fileName);
+		}
+
+		if (file_exists(public_path($songUrl))) {
+			return asset($songUrl);
+		}
+
+		if (file_exists(public_path('song/' . $fileName))) {
+			return asset('song/' . $fileName);
+		}
+
+		return $songUrl;
 	}
 }

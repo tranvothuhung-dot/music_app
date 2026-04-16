@@ -133,6 +133,16 @@
 			min-height: 52px;
 		}
 
+		.genre-name-link {
+			color: #111827;
+			text-decoration: none;
+		}
+
+		.genre-name-link:hover {
+			color: #111827;
+			text-decoration: underline;
+		}
+
 		.genre-footer {
 			margin-top: 10px;
 			display: flex;
@@ -366,7 +376,9 @@
 						</div>
 						<div class="genre-body">
 							<p class="genre-id">ID: #{{ $genre['id'] }}</p>
-							<p class="genre-name">{{ $genre['name'] }}</p>
+							<p class="genre-name">
+								<a class="genre-name-link" href="{{ route('admin.genres.songs', $genre['id']) }}">{{ $genre['name'] }}</a>
+							</p>
 							<div class="genre-footer">
 								<div class="action-buttons">
 									<a
@@ -402,6 +414,7 @@
 				@endforeach
 			</div>
 		@endif
+
 	</section>
 
 	<div class="genre-modal-overlay" id="genreModalOverlay" aria-hidden="true">
@@ -518,6 +531,7 @@
 					closeEditModal();
 				}
 			});
+
 		});
 	</script>
 </x-admin-layout>

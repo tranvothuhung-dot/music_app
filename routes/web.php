@@ -37,11 +37,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/artists/{artist}', [ArtistController::class, 'destroy'])->name('artists.destroy');
 
         Route::get('/albums', [AlbumsController::class, 'index'])->name('albums.index');
+        Route::get('/albums/{album}/songs', [AlbumsController::class, 'songs'])->name('albums.songs');
         Route::post('/albums', [AlbumsController::class, 'store'])->name('albums.store');
         Route::put('/albums/{album}', [AlbumsController::class, 'update'])->name('albums.update');
         Route::delete('/albums/{album}', [AlbumsController::class, 'destroy'])->name('albums.destroy');
 
         Route::get('/genres', [GenresController::class, 'index'])->name('genres.index');
+        Route::get('/genres/{genre}/songs', [GenresController::class, 'songs'])->name('genres.songs');
         Route::post('/genres', [GenresController::class, 'store'])->name('genres.store');
         Route::put('/genres/{genre}', [GenresController::class, 'update'])->name('genres.update');
         Route::delete('/genres/{genre}', [GenresController::class, 'destroy'])->name('genres.destroy');
