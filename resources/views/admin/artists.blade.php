@@ -150,7 +150,8 @@
             border: 1px solid #ced4da;
             border-radius: 4px;
             padding: 6px 10px;
-            font-size: 14px;
+            font-size: inherit;
+            font-family: inherit;
             color: #495057;
             outline: none;
             margin-bottom: 12px;
@@ -221,42 +222,49 @@
         }
 
         .artist-table-wrap {
-            border-radius: 16px;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
+            overflow-x: auto;
+            border: 1px solid #e5e8ef;
+            border-radius: 12px;
         }
 
         .artist-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1250px;
+            font-size: 13px;
         }
 
         .artist-table thead th {
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
-            color: #7b8593;
-            background: #fff;
-            border-bottom: 2px solid #e2e8f0;
-            padding: 14px 22px;
+            text-align: center;
+            font-weight: 700;
+            background: #f7f9fc;
+            padding: 10px;
+            border-bottom: 1px solid #edf1f7;
+            vertical-align: top;
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         .artist-table tbody td {
-            border-top: 1px solid #e8edf5;
-            padding: 12px 22px;
-            font-size: 14px;
-            font-weight: 600;
+            text-align: center;
+            border-bottom: 1px solid #edf1f7;
+            padding: 10px;
+            font-size: 13px;
             color: #212938;
-            vertical-align: middle;
+            vertical-align: top;
         }
 
         .artist-avatar {
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
             object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #e5e7eb;
+            border: 1px solid #d8deea;
+            background: #f2f4f8;
+        }
+
+        .text-muted {
+            color: #7f8796;
         }
 
         .action-buttons {
@@ -311,7 +319,7 @@
             text-align: center;
             padding: 28px 22px;
             color: #7b8593;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
@@ -323,7 +331,7 @@
             .search-input,
             .search-button,
             .add-button {
-                font-size: 14px;
+                font-size: 13px;
                 height: 40px;
             }
 
@@ -333,11 +341,11 @@
             }
 
             .artist-table thead th {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .artist-table tbody td {
-                font-size: 14px;
+                font-size: 13px;
             }
         }
 
@@ -349,14 +357,6 @@
 
             .search-form {
                 max-width: 100%;
-            }
-
-            .artist-table-wrap {
-                overflow-x: auto;
-            }
-
-            .artist-table {
-                min-width: 760px;
             }
         }
     </style>
@@ -392,12 +392,12 @@
             <table class="artist-table">
                 <thead>
                     <tr>
-                        <th style="width: 10%;">ID</th>
-                        <th style="width: 16%;">AVATAR</th>
-                        <th style="width: 24%;">TÊN NGHỆ SĨ</th>
-                        <th style="width: 20%;">BIO</th>
-                        <th style="width: 14%;">NGÀY KHỞI TẠO</th>
-                        <th style="width: 16%;">HÀNH ĐỘNG</th>
+                        <th>ID</th>
+                        <th>AVATAR</th>
+                        <th>TÊN NGHỆ SĨ</th>
+                        <th>BIO</th>
+                        <th>NGÀY KHỞI TẠO</th>
+                        <th>HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -405,7 +405,11 @@
                         <tr>
                             <td>#{{ $artist['id'] }}</td>
                             <td>
-                                <img class="artist-avatar" src="{{ $artist['avatar'] }}" alt="{{ $artist['name'] }}">
+                                @if($artist['avatar'])
+                                    <img class="artist-avatar" src="{{ $artist['avatar'] }}" alt="{{ $artist['name'] }}">
+                                @else
+                                    <span class="text-muted">Không có ảnh</span>
+                                @endif
                             </td>
                             <td>{{ $artist['name'] }}</td>
                             <td>{{ $artist['bio'] }}</td>
