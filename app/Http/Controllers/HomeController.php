@@ -43,7 +43,12 @@ class HomeController extends Controller
 
         $news = [];
         if (Schema::hasTable('news')) {
+            $hasNewsStatus = Schema::hasColumn('news', 'status');
+
             $news = DB::table('news')
+                ->when($hasNewsStatus, function ($query) {
+                    $query->where('status', 1);
+                })
                 ->orderByDesc('created_at')
                 ->limit(4)
                 ->get();
@@ -121,7 +126,12 @@ class HomeController extends Controller
         $news = [];
 
         if (Schema::hasTable('news')) {
+            $hasNewsStatus = Schema::hasColumn('news', 'status');
+
             $news = DB::table('news')
+                ->when($hasNewsStatus, function ($query) {
+                    $query->where('status', 1);
+                })
                 ->orderByDesc('created_at')
                 ->get();
         }

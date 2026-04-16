@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\ArtistController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\SongController;
 use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\GenresController;
 use App\Http\Controllers\HomeController;
@@ -44,17 +46,15 @@ Route::middleware('auth')->group(function () {
         Route::put('/genres/{genre}', [GenresController::class, 'update'])->name('genres.update');
         Route::delete('/genres/{genre}', [GenresController::class, 'destroy'])->name('genres.destroy');
 
-        Route::view('/songs', 'admin.placeholder', [
-            'title' => 'Bài Hát - Admin',
-            'heading' => 'Bài Hát',
-            'description' => 'Trang quản lý bài hát sẽ được hiển thị ở đây.',
-        ])->name('songs.index');
+        Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
+        Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
+        Route::patch('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
+        Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
 
-        Route::view('/news', 'admin.placeholder', [
-            'title' => 'Tin Tức - Admin',
-            'heading' => 'Tin Tức',
-            'description' => 'Trang quản lý tin tức sẽ được hiển thị ở đây.',
-        ])->name('news.index');
+        Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+        Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+        Route::patch('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

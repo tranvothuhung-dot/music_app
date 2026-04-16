@@ -104,8 +104,8 @@ class ArtistController extends Controller
 
         $avatarFileName = $this->storeAvatarImage($request);
 
-        if ($avatarFileName !== null && Schema::hasColumn('artists', 'avatar_image')) {
-            $insertData['avatar_image'] = $avatarFileName;
+        if (Schema::hasColumn('artists', 'avatar_image')) {
+            $insertData['avatar_image'] = $avatarFileName ?? 'admin.png';
         }
 
         if (Schema::hasColumn('artists', 'created_at')) {
