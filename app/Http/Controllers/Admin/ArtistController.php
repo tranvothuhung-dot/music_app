@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class ArtistController extends Controller
@@ -44,7 +43,7 @@ class ArtistController extends Controller
                     'bio' => $artist->bio ?? '',
                     'avatar' => $this->resolveAvatarUrl($artist),
                     'created_at' => !empty($artist->created_at)
-                        ? Carbon::parse($artist->created_at)->format('d/m/Y H:i')
+                        ? $artist->created_at
                         : '-',
                 ];
             });
