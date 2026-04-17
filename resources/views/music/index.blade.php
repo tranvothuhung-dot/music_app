@@ -107,21 +107,19 @@
                                 $albumIndex = $loop->iteration <= 8 ? $loop->iteration : ($loop->iteration % 8 ?: 8);
                                 $albumDefault = 'al' . $albumIndex . '.png';
                                 $albumSource = $album->image ?? $album->album_image ?? (isset($album->new_image) ? $album->new_image : null);
-                            @endphp
-                            
-                            @php
-                                $albumId = $album->album_id ?? $album->id ?? 0;
+                                $albumId = $album->album_id ?? $album->id ?? null;
+                                $albumDetailUrl = $albumId ? route('music.album', $albumId) : route('music.albums');
                             @endphp
                             <div class="card-img-wrapper">
                                 <img src="{{ asset($albumSource ? 'storage/image/' . $albumSource : 'images/' . $albumDefault) }}" class="card-img-top" alt="{{ $album->album_name }}">
                                 <div class="play-overlay">
-                                    <a href="{{ route('music.album', ['id' => $albumId]) }}" class="btn-xem-album">Xem Album</a>
+                                    <a href="{{ $albumDetailUrl }}" class="btn-xem-album">Xem Album</a>
                                 </div>
                             </div>
 
                             <div class="card-body text-center">
                                 <h5 class="card-title mb-1">{{ $album->album_name }}</h5>
-                                <a href="{{ route('music.album', ['id' => $albumId]) }}" class="card-text text-primary text-decoration-none">{{ $album->artist_name ?? 'Nghệ sĩ chưa rõ' }}</a>
+                                <a href="{{ $albumDetailUrl }}" class="card-text text-primary text-decoration-none">{{ $album->artist_name ?? 'Nghệ sĩ chưa rõ' }}</a>
                             </div>
                         </div>
                     </div>
@@ -202,28 +200,7 @@
             </div>
         </section>
 
-        <section class="mb-5">
-            <div class="section-heading">
-                <h2 class="title-highlight">Thể Loại</h2>
-                <a href="{{ route('music.genres') }}">Xem tất cả</a>
-            </div>
-            <div class="row g-4">
-                @if(isset($genres) && $genres->count() > 0)
-                    @foreach($genres->take(4) as $genre)
-                        @php
-                            $genreId = $genre->danh_muc_id ?? $genre->id ?? 0;
-                        @endphp
-                        <div class="col-md-6">
-                            <a href="{{ route('music.genre', ['id' => $genreId]) }}" class="text-decoration-none">
-                                <div class="genre-box" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border-radius: 12px; padding: 60px 20px; display: flex; align-items: center; justify-content: center; min-height: 160px; cursor: pointer; transition: all 0.3s ease; border: none;">
-                                    <h5 style="color: #ff4081; font-weight: 800; font-size: 1.4rem; margin: 0; text-align: center;">{{ $genre->ten_danh_muc ?? $genre->genre_name ?? 'Thể loại' }}</h5>
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
-                @endif
-            </div>
-        </section>
+        
 
     </div>
 </x-music-layout>

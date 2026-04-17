@@ -19,8 +19,8 @@ class MusicController2 extends Controller
 
         $newReleases = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
-            ->leftJoin('danh_muc_am_nhac as g', 's.genre_id', '=', 'g.id')
-            ->select('s.*', 'a.artist_name', 'g.ten_danh_muc as genre_name')
+            ->leftJoin('genres as g', 's.genre_id', '=', 'g.genre_id')
+            ->select('s.*', 'a.artist_name', 'g.genre_name')
             ->orderByDesc('s.created_at')
             ->limit(8)
             ->get();
@@ -38,8 +38,8 @@ class MusicController2 extends Controller
             ->get();
 
         $genres = collect();
-        if (Schema::hasTable('danh_muc_am_nhac')) {
-            $genres = DB::table('danh_muc_am_nhac')->limit(4)->get();
+        if (Schema::hasTable('genres')) {
+            $genres = DB::table('genres')->limit(4)->get();
         }
 
         $news = [];
@@ -130,7 +130,11 @@ class MusicController2 extends Controller
 
     public function genres()
     {
-        $genres = DB::table('danh_muc_am_nhac')->get();
+        $genres = collect();
+
+        if (Schema::hasTable('genres')) {
+            $genres = DB::table('genres')->get();
+        }
 
         return view('music.genres', [
             'genres' => $genres,
@@ -217,7 +221,6 @@ class MusicController2 extends Controller
     {
         $artist = DB::table('artists')
             ->where('artist_id', $id)
-            ->orWhere('id', $id)
             ->first();
 
         if (!$artist) {
@@ -227,7 +230,7 @@ class MusicController2 extends Controller
         $songs = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
             ->select('s.*', 'a.artist_name')
-            ->where('s.artist_id', $artist->artist_id ?? $artist->id)
+            ->where('s.artist_id', $artist->artist_id)
             ->get();
 
         return view('music.artist-detail', [
@@ -238,8 +241,8 @@ class MusicController2 extends Controller
 
     public function genreDetail($id)
     {
-        $genre = DB::table('danh_muc_am_nhac')
-            ->where('id', $id)
+        $genre = DB::table('genres')
+            ->where('genre_id', $id)
             ->first();
 
         if (!$genre) {
@@ -249,7 +252,7 @@ class MusicController2 extends Controller
         $songs = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
             ->select('s.*', 'a.artist_name')
-            ->where('s.genre_id', $genre->id)
+            ->where('s.genre_id', $genre->genre_id)
             ->get();
 
         return view('music.genre-detail', [

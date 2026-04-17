@@ -8,12 +8,12 @@
             <div class="row g-4 mt-2">
                 @forelse($genres as $genre)
                     @php
-                        $genreId = $genre->danh_muc_id ?? $genre->id ?? 0;
+                        $genreId = $genre->genre_id ?? $genre->id ?? 0;
                     @endphp
                     <div class="col-md-6 col-lg-3">
                         <a href="{{ route('music.genre', ['id' => $genreId]) }}" class="text-decoration-none">
                             <div class="genre-box">
-                                <h5 class="genre-text">{{ $genre->ten_danh_muc ?? $genre->genre_name ?? 'Thể loại' }}</h5>
+                                <h5 class="genre-text">{{ $genre->genre_name ?? $genre->ten_danh_muc ?? 'Thể loại' }}</h5>
                             </div>
                         </a>
                     </div>

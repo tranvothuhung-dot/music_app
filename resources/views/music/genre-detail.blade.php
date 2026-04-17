@@ -4,74 +4,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        .genre-header {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 20px 20px;
-            text-align: center;
-        }
-
-        .genre-info {
-            max-width: 1000px;
+        .container-genre {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 15px;
         }
 
-        .genre-icon {
-            width: 120px;
-            height: 120px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.2);
+        /* --- CSS Cho Thẻ Thông Tin Bên Trái --- */
+        .genre-sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            position: sticky;
+            top: 100px; /* Cố định khi cuộn chuột */
+        }
+
+        /* Vòng tròn Icon Thể loại giống Hình 2 */
+        .genre-icon-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: #f0f5ff; /* Nền xanh nhạt */
+            color: #72a1ed; /* Nốt nhạc xanh dương */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 3rem;
+            font-size: 5.5rem;
+            margin: 0 auto 24px auto;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.02);
         }
 
-        .genre-header h1 {
-            font-size: 2.5rem;
+        .genre-title {
+            font-size: 28px;
             font-weight: 800;
-            margin: 0;
-            letter-spacing: -0.02em;
+            color: #2b2b2b;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
-        .genre-header p {
-            font-size: 1rem;
-            margin: 0.5rem 0 0;
-            opacity: 0.95;
+        .genre-subtitle {
+            color: #0d6efd; /* Màu xanh dương */
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
         }
 
-        .songs-list {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 15px;
+        .genre-count {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+        .btn-play-all {
+            background-color: #f82c75;
+            color: white;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            width: 100%;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-play-all:hover {
+            background-color: #e01b60;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(248, 44, 117, 0.3);
+        }
+
+        /* --- CSS Cho Danh Sách Bài Hát Bên Phải --- */
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: #2b2b2b;
+            border-left: 5px solid #bd0f4d; /* Vạch đỏ/hồng nổi bật */
+            padding-left: 14px;
+            margin-bottom: 24px;
+            line-height: 1.2;
         }
 
         .song-item {
             display: flex;
             align-items: center;
-            padding: 1.2rem;
+            padding: 14px 20px;
             background: white;
             border-radius: 12px;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(229, 231, 235, 0.5);
             transition: all 0.2s ease;
+            cursor: pointer;
+            color: inherit;
+            text-decoration: none;
         }
 
         .song-item:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             transform: translateY(-2px);
+            border-color: rgba(248, 44, 117, 0.3);
         }
 
         .song-num {
             font-weight: 700;
             color: #6b7280;
-            width: 40px;
-            text-align: center;
-            margin-right: 1rem;
+            width: 30px;
+            font-size: 14px;
         }
 
         .song-cover-sm {
@@ -79,7 +126,7 @@
             height: 50px;
             border-radius: 8px;
             object-fit: cover;
-            margin-right: 1rem;
+            margin-right: 16px;
         }
 
         .song-info {
@@ -89,34 +136,14 @@
         .song-name {
             font-weight: 700;
             color: #111827;
-            margin: 0;
-            font-size: 0.95rem;
+            margin: 0 0 4px 0;
+            font-size: 15px;
         }
 
         .song-artist {
             color: #6b7280;
-            font-size: 0.85rem;
+            font-size: 13px;
             margin: 0;
-        }
-
-        .play-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #ff4081;
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            margin-left: auto;
-        }
-
-        .play-btn:hover {
-            background: #e83274;
-            transform: scale(1.1);
         }
 
         .back-link {
@@ -124,63 +151,102 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 15px;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
         .back-link:hover {
-            color: #111827;
+            color: #f82c75;
+        }
+
+        /* Ẩn trạng thái Active của Menu khi ở trang chi tiết (Đã fix lỗi chữ tàng hình) */
+        .navbar-nav .nav-link.active {
+            background-color: transparent !important;
+            color: #444 !important; /* Ép chữ về màu đen xám */
+            box-shadow: none !important;
+        }
+        .navbar-nav .nav-link.active:hover {
+            color: #f82c75 !important; /* Hover thì ra màu hồng */
         }
     </style>
 
-    <a href="javascript:history.back()" class="back-link">
-        <i class="fas fa-arrow-left"></i> Quay lại
-    </a>
-
-    <div class="genre-header">
-        <div class="genre-info">
-            <div class="genre-icon">
-                <i class="fas fa-music"></i>
-            </div>
-            <h1>{{ $genre->ten_danh_muc ?? $genre->genre_name ?? 'Thể loại' }}</h1>
-            <p>{{ count($songs) }} bài hát</p>
-        </div>
-    </div>
-
-    <div class="songs-list">
-        <h3 class="fw-bold mb-3">Bài hát</h3>
+    <div class="container py-4 container-genre">
         
-        @if($songs->count() > 0)
-            @foreach($songs as $idx => $song)
-                @php
-                    $songImage = $song->image ?? $song->song_image ?? null;
-                    $songId = $song->song_id ?? $song->id ?? 0;
-                @endphp
-                <div class="song-item">
-                    <div class="song-num">{{ $idx + 1 }}</div>
-                    <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
-                    <div class="song-info">
-                        <p class="song-name">{{ $song->song_name }}</p>
-                        <p class="song-artist">{{ $song->artist_name ?? 'Nghệ sĩ chưa rõ' }}</p>
+        <a href="javascript:history.back()" class="back-link">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+
+        <div class="row g-5">
+            
+            <div class="col-lg-4 col-md-5">
+                <div class="genre-sidebar-card">
+                    @php
+                        $firstSongId = $songs->count() > 0 ? ($songs->first()->song_id ?? $songs->first()->id ?? null) : null;
+                    @endphp
+                    
+                    <div class="genre-icon-circle">
+                        <i class="fas fa-music"></i>
                     </div>
+
+                    <h1 class="genre-title">{{ $genre->ten_danh_muc ?? $genre->genre_name ?? 'Thể loại' }}</h1>
+                    <div class="genre-subtitle">Tuyển tập</div>
+                    <div class="genre-count">{{ count($songs) }} bài hát</div>
+
                     @guest
-                        <button class="play-btn" data-bs-toggle="modal" data-bs-target="#requireLoginModal" title="Play">
-                            <i class="fas fa-play"></i>
+                        <button class="btn-play-all" data-bs-toggle="modal" data-bs-target="#requireLoginModal">
+                            <i class="fas fa-play"></i> Phát Nhạc Ngay
                         </button>
                     @else
-                        <a href="{{ route('music.song', ['id' => $songId]) }}" class="play-btn" title="Play">
-                            <i class="fas fa-play"></i>
-                        </a>
+                        @if($firstSongId)
+                            <a href="{{ route('music.song', ['id' => $firstSongId]) }}" class="btn-play-all">
+                                <i class="fas fa-play"></i> Phát Nhạc Ngay
+                            </a>
+                        @else
+                            <button class="btn-play-all" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                <i class="fas fa-play"></i> Phát Nhạc Ngay
+                            </button>
+                        @endif
                     @endguest
                 </div>
-            @endforeach
-        @else
-            <div class="alert alert-info">Thể loại này chưa có bài hát nào.</div>
-        @endif
-    </div>
+            </div>
 
+            <div class="col-lg-8 col-md-7">
+                <h3 class="section-title">Danh sách bài hát</h3>
+                
+                @if($songs->count() > 0)
+                    @foreach($songs as $idx => $song)
+                        @php
+                            $songImage = $song->image ?? $song->song_image ?? null;
+                            $songId = $song->song_id ?? $song->id ?? 0;
+                        @endphp
+                        
+                        @guest
+                            <div class="song-item" data-bs-toggle="modal" data-bs-target="#requireLoginModal">
+                        @else
+                            <a href="{{ route('music.song', ['id' => $songId]) }}" class="song-item">
+                        @endguest
+                        
+                            <div class="song-num">{{ $idx + 1 }}</div>
+                            <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
+                            <div class="song-info">
+                                <p class="song-name">{{ $song->song_name }}</p>
+                                <p class="song-artist">{{ $song->artist_name ?? 'Nghệ sĩ chưa rõ' }}</p>
+                            </div>
+                            
+                        @guest
+                            </div>
+                        @else
+                            </a>
+                        @endguest
+                        
+                    @endforeach
+                @else
+                    <div class="alert alert-info border-0 shadow-sm rounded-3">Thể loại này chưa có bài hát nào.</div>
+                @endif
+            </div>
+
+        </div>
+    </div>
 </x-music-layout>
