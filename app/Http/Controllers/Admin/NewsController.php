@@ -13,13 +13,16 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         $keyword = trim((string) $request->query('q', ''));
+        $perPage = (int) $request->query('per_page', 5);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 
         $newsItems = collect();
+        $pagination = null;
 
         if (Schema::hasTable('news')) {
             $hasStatusColumn = Schema::hasColumn('news', 'status');
 
-            $newsItems = DB::table('news')
+            $pagination = DB::table('news')
                 ->when($hasStatusColumn, function ($query) {
                     $query->where('status', 1);
                 })
@@ -34,8 +37,10 @@ class NewsController extends Controller
                     });
                 })
                 ->orderByDesc('created_at')
-                ->get()
-                ->map(function ($item) {
+                ->paginate($perPage)
+                ->withQueryString();
+
+            $newsItems = $pagination->getCollection()->map(function ($item) {
                     $eventDateRaw = $item->event_date ? date('Y-m-d', strtotime((string) $item->event_date)) : '';
                     $eventDate = $item->event_date ? date('d/m', strtotime((string) $item->event_date)) : '';
                     $newImage = trim((string) ($item->new_image ?? ''));
@@ -61,6 +66,8 @@ class NewsController extends Controller
         return view('admin.news', [
             'keyword' => $keyword,
             'newsItems' => $newsItems,
+            'pagination' => $pagination,
+            'perPage' => $perPage,
         ]);
     }
 

@@ -2,6 +2,8 @@
 	@php
 		$albums = $albums ?? collect();
 		$keyword = $keyword ?? '';
+		$pagination = $pagination ?? null;
+		$perPage = $perPage ?? 5;
 	@endphp
 
 	<style>
@@ -78,7 +80,7 @@
 		}
 
 		.album-table-wrap {
-			overflow-x: auto;
+			overflow: hidden;
 			border: 1px solid #e5e8ef;
 			border-radius: 12px;
 		}
@@ -86,8 +88,102 @@
 		.album-table {
 			width: 100%;
 			border-collapse: collapse;
-			min-width: 1400px;
+			min-width: 100%;
+			table-layout: fixed;
 			font-size: 13px;
+		}
+
+		.album-per-page-row {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+			padding: 12px 0;
+		}
+
+		.album-per-page-label {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.album-per-page-select {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			color: #495057;
+			background: #fff;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.album-per-page-select:hover {
+			border-color: #ff5897;
+		}
+
+		.album-per-page-select:focus {
+			outline: none;
+			border-color: #ff5897;
+			box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
+		}
+
+		.album-pagination-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			background: #f7f9fc;
+			border: 1px solid #e5e8ef;
+			border-top: 0;
+			border-radius: 0 0 12px 12px;
+			margin-top: 12px;
+			gap: 16px;
+			flex-wrap: wrap;
+		}
+
+		.album-pagination-info {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.album-pagination-controls {
+			display: flex;
+			gap: 6px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		.album-pagination-controls a,
+		.album-pagination-controls span {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			text-decoration: none;
+			color: #ff5897;
+			transition: all 0.2s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			height: 32px;
+		}
+
+		.album-pagination-controls a:hover {
+			background: #fff5f8;
+			border-color: #ff5897;
+		}
+
+		.album-pagination-controls span.active {
+			background: #ff5897;
+			color: #fff;
+			border-color: #ff5897;
+			font-weight: 600;
+		}
+
+		.album-pagination-controls span.disabled {
+			color: #999;
+			border-color: #dee2e6;
+			cursor: not-allowed;
 		}
 
 		.album-table thead th {
@@ -374,6 +470,20 @@
 			<button class="add-button" id="openAlbumModal" type="button">+ Thêm Album</button>
 		</div>
 
+		<div class="album-per-page-row">
+			<form method="GET" action="{{ route('admin.albums.index') }}" style="display:flex; gap:8px; align-items:center;">
+				<input type="hidden" name="q" value="{{ $keyword }}">
+				<label class="album-per-page-label" for="albumPerPageSelect">Bản ghi mỗi trang:</label>
+				<select class="album-per-page-select" id="albumPerPageSelect" name="per_page" onchange="this.form.submit()">
+					<option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+					<option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+					<option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+					<option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+					<option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+				</select>
+			</form>
+		</div>
+
 		<div class="album-table-wrap">
 			<table class="album-table">
 				<thead>
@@ -442,6 +552,35 @@
 				</tbody>
 			</table>
 		</div>
+
+		@if($pagination && $pagination->hasPages())
+			<div class="album-pagination-top">
+				<div class="album-pagination-info">
+					Hiển thị {{ $pagination->firstItem() }} đến {{ $pagination->lastItem() }} trong {{ $pagination->total() }} bản ghi
+				</div>
+				<div class="album-pagination-controls">
+					@if($pagination->onFirstPage())
+						<span class="disabled">← Trước</span>
+					@else
+						<a href="{{ $pagination->previousPageUrl() }}" title="Trang trước">← Trước</a>
+					@endif
+
+					@foreach($pagination->getUrlRange(1, $pagination->lastPage()) as $page => $url)
+						@if($page == $pagination->currentPage())
+							<span class="active">{{ $page }}</span>
+						@else
+							<a href="{{ $url }}">{{ $page }}</a>
+						@endif
+					@endforeach
+
+					@if($pagination->hasMorePages())
+						<a href="{{ $pagination->nextPageUrl() }}" title="Trang sau">Sau →</a>
+					@else
+						<span class="disabled">Sau →</span>
+					@endif
+				</div>
+			</div>
+		@endif
 
 	</section>
 

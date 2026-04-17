@@ -2,6 +2,8 @@
 	@php
 		$genre = $genre ?? ['id' => 0, 'name' => ''];
 		$songs = collect($songs ?? []);
+		$pagination = $pagination ?? null;
+		$perPage = $perPage ?? 5;
 	@endphp
 
 	<style>
@@ -86,7 +88,7 @@
 		}
 
 		.song-table-wrap {
-			overflow-x: auto;
+			overflow: hidden;
 			border: 1px solid #e5e8ef;
 			border-radius: 12px;
 		}
@@ -94,8 +96,102 @@
 		.song-table {
 			width: 100%;
 			border-collapse: collapse;
-			min-width: 1120px;
+			min-width: 100%;
+			table-layout: fixed;
 			font-size: 13px;
+		}
+
+		.per-page-row {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+			padding: 12px 0;
+		}
+
+		.per-page-label {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.per-page-select {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			color: #495057;
+			background: #fff;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.per-page-select:hover {
+			border-color: #ff5897;
+		}
+
+		.per-page-select:focus {
+			outline: none;
+			border-color: #ff5897;
+			box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
+		}
+
+		.pagination-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			background: #f7f9fc;
+			border: 1px solid #e5e8ef;
+			border-top: 0;
+			border-radius: 0 0 12px 12px;
+			margin-top: 12px;
+			gap: 16px;
+			flex-wrap: wrap;
+		}
+
+		.pagination-info {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.pagination-controls {
+			display: flex;
+			gap: 6px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		.pagination-controls a,
+		.pagination-controls span {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			text-decoration: none;
+			color: #ff5897;
+			transition: all 0.2s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			height: 32px;
+		}
+
+		.pagination-controls a:hover {
+			background: #fff5f8;
+			border-color: #ff5897;
+		}
+
+		.pagination-controls span.active {
+			background: #ff5897;
+			color: #fff;
+			border-color: #ff5897;
+			font-weight: 600;
+		}
+
+		.pagination-controls span.disabled {
+			color: #999;
+			border-color: #dee2e6;
+			cursor: not-allowed;
 		}
 
 		.song-table th,
@@ -212,6 +308,19 @@
 			<a class="back-link" href="{{ route('admin.genres.index') }}">← Quay lại Genres</a>
 		</div>
 
+		<div class="per-page-row">
+			<form method="GET" action="{{ route('admin.genres.songs', $genre['id']) }}" style="display:flex; gap:8px; align-items:center;">
+				<label class="per-page-label" for="genreSongsPerPageSelect">Bản ghi mỗi trang:</label>
+				<select class="per-page-select" id="genreSongsPerPageSelect" name="per_page" onchange="this.form.submit()">
+					<option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+					<option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+					<option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+					<option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+					<option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+				</select>
+			</form>
+		</div>
+
 		@if($songs->isEmpty())
 			<div class="empty-box">Thể loại này chưa có bài hát.</div>
 		@else
@@ -282,6 +391,35 @@
 					</tbody>
 				</table>
 			</div>
+
+			@if($pagination && $pagination->hasPages())
+				<div class="pagination-top">
+					<div class="pagination-info">
+						Hiển thị {{ $pagination->firstItem() }} đến {{ $pagination->lastItem() }} trong {{ $pagination->total() }} bản ghi
+					</div>
+					<div class="pagination-controls">
+						@if($pagination->onFirstPage())
+							<span class="disabled">← Trước</span>
+						@else
+							<a href="{{ $pagination->previousPageUrl() }}" title="Trang trước">← Trước</a>
+						@endif
+
+						@foreach($pagination->getUrlRange(1, $pagination->lastPage()) as $page => $url)
+							@if($page == $pagination->currentPage())
+								<span class="active">{{ $page }}</span>
+							@else
+								<a href="{{ $url }}">{{ $page }}</a>
+							@endif
+						@endforeach
+
+						@if($pagination->hasMorePages())
+							<a href="{{ $pagination->nextPageUrl() }}" title="Trang sau">Sau →</a>
+						@else
+							<span class="disabled">Sau →</span>
+						@endif
+					</div>
+				</div>
+			@endif
 		@endif
 	</section>
 

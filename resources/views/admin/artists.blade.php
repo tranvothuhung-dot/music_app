@@ -222,16 +222,98 @@
         }
 
         .artist-table-wrap {
-            overflow-x: auto;
             border: 1px solid #e5e8ef;
             border-radius: 12px;
+            overflow: hidden;
         }
 
         .artist-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1250px;
             font-size: 13px;
+        }
+
+        .artist-pagination-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f7f9fc;
+            border-bottom: 1px solid #e5e8ef;
+            border-radius: 0 0 12px 12px;
+            margin-top: 12px;
+        }
+
+        .artist-pagination-info {
+            font-size: 13px;
+            color: #667084;
+        }
+
+        .artist-pagination-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .artist-pagination-controls a,
+        .artist-pagination-controls span {
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 13px;
+            text-decoration: none;
+            color: #ff5897;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+        }
+
+        .artist-pagination-controls a:hover {
+            background: #fff5f8;
+            border-color: #ff5897;
+        }
+
+        .artist-pagination-controls span.active {
+            background: #ff5897;
+            color: white;
+            border-color: #ff5897;
+            font-weight: 600;
+        }
+
+        .artist-pagination-controls span.disabled {
+            color: #999;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+        }
+
+        .artist-per-page-select {
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #495057;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .artist-per-page-select:hover {
+            border-color: #ff5897;
+        }
+
+        .artist-per-page-select:focus {
+            outline: none;
+            border-color: #ff5897;
+            box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
+        }
+
+        .artist-per-page-label {
+            font-size: 13px;
+            color: #667084;
+            margin-right: 4px;
         }
 
         .artist-table thead th {
@@ -388,6 +470,20 @@
             <button class="add-button" id="openArtistModal" type="button">+ Thêm Nghệ Sĩ</button>
         </div>
 
+        <div style="padding: 12px 0; display: flex; gap: 12px; align-items: center;">
+            <form method="GET" action="{{ route('admin.artists.index') }}" style="display: flex; gap: 8px; align-items: center;">
+                <input type="hidden" name="q" value="{{ $keyword }}">
+                <label class="artist-per-page-label" for="perPageSelect">Bản ghi mỗi trang:</label>
+                <select class="artist-per-page-select" id="perPageSelect" name="per_page" onchange="this.form.submit()">
+                    <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                    <option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
+        </div>
+
         <div class="artist-table-wrap">
             <table class="artist-table">
                 <thead>
@@ -446,6 +542,36 @@
                 </tbody>
             </table>
         </div>
+
+        @if($pagination->hasPages())
+            <div class="artist-pagination-top">
+                <div class="artist-pagination-info">
+                    Hiển thị {{ $pagination->firstItem() }} đến {{ $pagination->lastItem() }} trong {{ $pagination->total() }} bản ghi
+                </div>
+                <div class="artist-pagination-controls">
+                    @if($pagination->onFirstPage())
+                        <span class="disabled">← Trước</span>
+                    @else
+                        <a href="{{ $pagination->previousPageUrl() }}&q={{ urlencode($keyword) }}" title="Trang trước">← Trước</a>
+                    @endif
+
+                    @foreach($pagination->getUrlRange(1, $pagination->lastPage()) as $page => $url)
+                        @if($page == $pagination->currentPage())
+                            <span class="active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}&q={{ urlencode($keyword) }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if($pagination->hasMorePages())
+                        <a href="{{ $pagination->nextPageUrl() }}&q={{ urlencode($keyword) }}" title="Trang sau">Sau →</a>
+                    @else
+                        <span class="disabled">Sau →</span>
+                    @endif
+                </div>
+            </div>
+        @endif
+
     </section>
 
     <div class="artist-modal-overlay" id="artistModalOverlay" aria-hidden="true">
