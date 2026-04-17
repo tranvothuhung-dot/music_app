@@ -1,4 +1,8 @@
 <x-admin-layout title="Người Dùng - Admin">
+    @php
+        $perPage = $perPage ?? 5;
+    @endphp
+
     @push('styles')
         <style>
             .users-wrap {
@@ -240,6 +244,7 @@
                 width: 100%;
                 border-collapse: collapse;
                 min-width: 1250px;
+                table-layout: auto;
                 font-size: 13px;
             }
 
@@ -350,6 +355,100 @@
                 margin-top: 14px;
             }
 
+            .users-per-page-row {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                padding: 12px 0;
+            }
+
+            .users-per-page-label {
+                font-size: 13px;
+                color: #667084;
+            }
+
+            .users-per-page-select {
+                padding: 6px 10px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 13px;
+                color: #495057;
+                background: #fff;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .users-per-page-select:hover {
+                border-color: #ff5897;
+            }
+
+            .users-per-page-select:focus {
+                outline: none;
+                border-color: #ff5897;
+                box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
+            }
+
+            .users-pagination-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background: #f7f9fc;
+                border: 1px solid #e5e8ef;
+                border-top: 0;
+                border-radius: 0 0 12px 12px;
+                margin-top: 12px;
+                margin-bottom: 0;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .users-pagination-info {
+                font-size: 13px;
+                color: #667084;
+            }
+
+            .users-pagination-controls {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .users-pagination-controls a,
+            .users-pagination-controls span {
+                padding: 6px 10px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 13px;
+                text-decoration: none;
+                color: #ff5897;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 32px;
+                height: 32px;
+            }
+
+            .users-pagination-controls a:hover {
+                background: #fff5f8;
+                border-color: #ff5897;
+            }
+
+            .users-pagination-controls span.active {
+                background: #ff5897;
+                color: #fff;
+                border-color: #ff5897;
+                font-weight: 600;
+            }
+
+            .users-pagination-controls span.disabled {
+                color: #999;
+                border-color: #dee2e6;
+                cursor: not-allowed;
+            }
+
             .text-muted {
                 color: #7f8796;
             }
@@ -423,6 +522,20 @@
                 </form>
                 <button type="button" class="add-button" id="openCreateUserModal">+ Thêm Người Dùng</button>
             </div>
+        </div>
+
+        <div class="users-per-page-row">
+            <form method="GET" action="{{ route('admin.users.index') }}" style="display: flex; gap: 8px; align-items: center;">
+                <input type="hidden" name="search" value="{{ $search }}">
+                <label class="users-per-page-label" for="usersPerPageSelect">Bản ghi mỗi trang:</label>
+                <select class="users-per-page-select" id="usersPerPageSelect" name="per_page" onchange="this.form.submit()">
+                    <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                    <option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
         </div>
 
         @if(session('success'))
@@ -525,9 +638,34 @@
             </table>
         </div>
 
-        <div class="pagination-wrap">
-            {{ $users->links() }}
-        </div>
+        @if($users->hasPages())
+            <div class="users-pagination-top">
+                <div class="users-pagination-info">
+                    Hiển thị {{ $users->firstItem() }} đến {{ $users->lastItem() }} trong {{ $users->total() }} bản ghi
+                </div>
+                <div class="users-pagination-controls">
+                    @if($users->onFirstPage())
+                        <span class="disabled">← Trước</span>
+                    @else
+                        <a href="{{ $users->previousPageUrl() }}" title="Trang trước">← Trước</a>
+                    @endif
+
+                    @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                        @if($page == $users->currentPage())
+                            <span class="active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if($users->hasMorePages())
+                        <a href="{{ $users->nextPageUrl() }}" title="Trang sau">Sau →</a>
+                    @else
+                        <span class="disabled">Sau →</span>
+                    @endif
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="modal-overlay" id="createUserModal" aria-hidden="true">

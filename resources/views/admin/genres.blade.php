@@ -2,6 +2,8 @@
 	@php
 		$genres = $genres ?? collect();
 		$keyword = $keyword ?? '';
+		$pagination = $pagination ?? null;
+		$perPage = $perPage ?? 5;
 		$covers = [
 			'linear-gradient(135deg, #ffd7e5, #ffd1a8)',
 			'linear-gradient(135deg, #c9f2ff, #d9d1ff)',
@@ -88,6 +90,99 @@
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 			gap: 16px;
+		}
+
+		.genre-per-page-row {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+			padding: 12px 0;
+		}
+
+		.genre-per-page-label {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.genre-per-page-select {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			color: #495057;
+			background: #fff;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.genre-per-page-select:hover {
+			border-color: #ff5897;
+		}
+
+		.genre-per-page-select:focus {
+			outline: none;
+			border-color: #ff5897;
+			box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
+		}
+
+		.genre-pagination-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			background: #f7f9fc;
+			border: 1px solid #e5e8ef;
+			border-top: 0;
+			border-radius: 0 0 12px 12px;
+			margin-top: 12px;
+			gap: 16px;
+			flex-wrap: wrap;
+		}
+
+		.genre-pagination-info {
+			font-size: 13px;
+			color: #667084;
+		}
+
+		.genre-pagination-controls {
+			display: flex;
+			gap: 6px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		.genre-pagination-controls a,
+		.genre-pagination-controls span {
+			padding: 6px 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+			font-size: 13px;
+			text-decoration: none;
+			color: #ff5897;
+			transition: all 0.2s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			height: 32px;
+		}
+
+		.genre-pagination-controls a:hover {
+			background: #fff5f8;
+			border-color: #ff5897;
+		}
+
+		.genre-pagination-controls span.active {
+			background: #ff5897;
+			color: #fff;
+			border-color: #ff5897;
+			font-weight: 600;
+		}
+
+		.genre-pagination-controls span.disabled {
+			color: #999;
+			border-color: #dee2e6;
+			cursor: not-allowed;
 		}
 
 		.genre-card {
@@ -362,6 +457,20 @@
 			<button class="add-button" id="openGenreModal" type="button">+ Thêm Thể Loại</button>
 		</div>
 
+		<div class="genre-per-page-row">
+			<form method="GET" action="{{ route('admin.genres.index') }}" style="display:flex; gap:8px; align-items:center;">
+				<input type="hidden" name="q" value="{{ $keyword }}">
+				<label class="genre-per-page-label" for="genrePerPageSelect">Bản ghi mỗi trang:</label>
+				<select class="genre-per-page-select" id="genrePerPageSelect" name="per_page" onchange="this.form.submit()">
+					<option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+					<option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+					<option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+					<option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+					<option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+				</select>
+			</form>
+		</div>
+
 		@if($genres->isEmpty())
 			<div class="empty-box">Không tìm thấy thể loại phù hợp.</div>
 		@else
@@ -412,6 +521,35 @@
 						</div>
 					</div>
 				@endforeach
+			</div>
+		@endif
+
+		@if($pagination && $pagination->hasPages())
+			<div class="genre-pagination-top">
+				<div class="genre-pagination-info">
+					Hiển thị {{ $pagination->firstItem() }} đến {{ $pagination->lastItem() }} trong {{ $pagination->total() }} bản ghi
+				</div>
+				<div class="genre-pagination-controls">
+					@if($pagination->onFirstPage())
+						<span class="disabled">← Trước</span>
+					@else
+						<a href="{{ $pagination->previousPageUrl() }}" title="Trang trước">← Trước</a>
+					@endif
+
+					@foreach($pagination->getUrlRange(1, $pagination->lastPage()) as $page => $url)
+						@if($page == $pagination->currentPage())
+							<span class="active">{{ $page }}</span>
+						@else
+							<a href="{{ $url }}">{{ $page }}</a>
+						@endif
+					@endforeach
+
+					@if($pagination->hasMorePages())
+						<a href="{{ $pagination->nextPageUrl() }}" title="Trang sau">Sau →</a>
+					@else
+						<span class="disabled">Sau →</span>
+					@endif
+				</div>
 			</div>
 		@endif
 

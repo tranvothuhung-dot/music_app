@@ -17,6 +17,8 @@ class AlbumsController extends Controller
 	public function index(Request $request): View
 	{
 		$keyword = trim((string) $request->query('q', ''));
+		$perPage = (int) $request->query('per_page', 5);
+		$perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 		$selectedAlbumId = (int) $request->query('album', 0);
 
 		$query = DB::table('albums');
@@ -36,10 +38,12 @@ class AlbumsController extends Controller
 			});
 		}
 
-		$albums = $query
+		$albumsPage = $query
 			->orderBy('album_id')
-			->get()
-			->map(function ($album) {
+			->paginate($perPage)
+			->withQueryString();
+
+		$albums = $albumsPage->getCollection()->map(function ($album) {
 				return [
 					'id' => $album->album_id,
 					'name' => $album->album_name,
@@ -100,7 +104,9 @@ class AlbumsController extends Controller
 
 		return view('admin.albums', [
 			'albums' => $albums,
+			'pagination' => $albumsPage,
 			'keyword' => $keyword,
+			'perPage' => $perPage,
 			'selectedAlbumId' => $selectedAlbumId,
 			'selectedAlbum' => $selectedAlbum,
 			'albumSongs' => $albumSongs,
@@ -109,6 +115,12 @@ class AlbumsController extends Controller
 
 	public function songs(int $album): View
 	{
+		$perPage = 5;
+		if (request()->has('per_page')) {
+			$requestedPerPage = (int) request()->query('per_page', 5);
+			$perPage = in_array($requestedPerPage, [5, 10, 15, 25, 50]) ? $requestedPerPage : 5;
+		}
+
 		$albumQuery = DB::table('albums')->where('album_id', $album);
 
 		if (Schema::hasColumn('albums', 'status')) {
@@ -139,9 +151,11 @@ class AlbumsController extends Controller
 			$songsQuery->where('s.status', 1);
 		}
 
-		$songs = $songsQuery
-			->get()
-			->map(function ($song) {
+		$songsPage = $songsQuery
+			->paginate($perPage)
+			->withQueryString();
+
+		$songs = $songsPage->getCollection()->map(function ($song) {
 				return [
 					'id' => (int) $song->song_id,
 					'title' => (string) ($song->song_name ?? ''),
@@ -159,6 +173,8 @@ class AlbumsController extends Controller
 				'name' => (string) $albumData->album_name,
 			],
 			'songs' => $songs,
+			'pagination' => $songsPage,
+			'perPage' => $perPage,
 		]);
 	}
 

@@ -15,6 +15,8 @@ class UsersController extends Controller
     public function users(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
+        $perPage = (int) $request->query('per_page', 5);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 
         $users = User::query()
             ->where('status', 1)
@@ -34,12 +36,13 @@ class UsersController extends Controller
                 });
             })
             ->orderBy('user_id')
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.users', [
             'users' => $users,
             'search' => $search,
+            'perPage' => $perPage,
         ]);
     }
 

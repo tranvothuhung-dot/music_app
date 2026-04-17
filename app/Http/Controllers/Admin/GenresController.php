@@ -16,6 +16,8 @@ class GenresController extends Controller
 	public function index(Request $request): View
 	{
 		$keyword = trim((string) $request->query('q', ''));
+		$perPage = (int) $request->query('per_page', 5);
+		$perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 
 		$query = DB::table('genres');
 
@@ -33,10 +35,12 @@ class GenresController extends Controller
 			});
 		}
 
-		$genres = $query
+		$genresPage = $query
 			->orderBy('genre_id')
-			->get()
-			->map(function ($genre) {
+			->paginate($perPage)
+			->withQueryString();
+
+		$genres = $genresPage->getCollection()->map(function ($genre) {
 				return [
 					'id' => $genre->genre_id,
 					'name' => $genre->genre_name,
@@ -45,12 +49,20 @@ class GenresController extends Controller
 
 		return view('admin.genres', [
 			'genres' => $genres,
+			'pagination' => $genresPage,
 			'keyword' => $keyword,
+			'perPage' => $perPage,
 		]);
 	}
 
 	public function songs(int $genre): View
 	{
+		$perPage = 5;
+		if (request()->has('per_page')) {
+			$requestedPerPage = (int) request()->query('per_page', 5);
+			$perPage = in_array($requestedPerPage, [5, 10, 15, 25, 50]) ? $requestedPerPage : 5;
+		}
+
 		$genreQuery = DB::table('genres')->where('genre_id', $genre);
 
 		if (Schema::hasColumn('genres', 'status')) {
@@ -83,9 +95,11 @@ class GenresController extends Controller
 			$songsQuery->where('s.status', 1);
 		}
 
-		$songs = $songsQuery
-			->get()
-			->map(function ($song) {
+		$songsPage = $songsQuery
+			->paginate($perPage)
+			->withQueryString();
+
+		$songs = $songsPage->getCollection()->map(function ($song) {
 				return [
 					'id' => (int) $song->song_id,
 					'title' => (string) ($song->song_name ?? ''),
@@ -104,6 +118,8 @@ class GenresController extends Controller
 				'name' => (string) $genreData->genre_name,
 			],
 			'songs' => $songs,
+			'pagination' => $songsPage,
+			'perPage' => $perPage,
 		]);
 	}
 

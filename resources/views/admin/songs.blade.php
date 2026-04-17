@@ -2,6 +2,8 @@
     @php
         $keyword = $keyword ?? trim((string) request('q', ''));
         $songs = collect($songs ?? []);
+        $pagination = $pagination ?? null;
+        $perPage = $perPage ?? 5;
         $artistsOptions = collect($artistsOptions ?? []);
         $albumsOptions = collect($albumsOptions ?? []);
         $genresOptions = collect($genresOptions ?? []);
@@ -86,9 +88,103 @@
             }
 
             .songs-table-wrap {
-                overflow-x: auto;
+                overflow: hidden;
                 border: 1px solid #e5e8ef;
                 border-radius: 12px;
+            }
+
+            .songs-pagination-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background: #f7f9fc;
+                border: 1px solid #e5e8ef;
+                border-top: 0;
+                border-radius: 0 0 12px 12px;
+                margin-bottom: 12px;
+                margin-top: 12px;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .songs-pagination-info {
+                font-size: 13px;
+                color: #667084;
+            }
+
+            .songs-pagination-controls {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .songs-pagination-controls a,
+            .songs-pagination-controls span {
+                padding: 6px 10px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 13px;
+                text-decoration: none;
+                color: #ff5897;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 32px;
+                height: 32px;
+            }
+
+            .songs-pagination-controls a:hover {
+                background: #fff5f8;
+                border-color: #ff5897;
+            }
+
+            .songs-pagination-controls span.active {
+                background: #ff5897;
+                color: #fff;
+                border-color: #ff5897;
+                font-weight: 600;
+            }
+
+            .songs-pagination-controls span.disabled {
+                color: #999;
+                border-color: #dee2e6;
+                cursor: not-allowed;
+            }
+
+            .songs-per-page-row {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                padding: 12px 0;
+            }
+
+            .songs-per-page-label {
+                font-size: 13px;
+                color: #667084;
+            }
+
+            .songs-per-page-select {
+                padding: 6px 10px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 13px;
+                color: #495057;
+                background: #fff;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .songs-per-page-select:hover {
+                border-color: #ff5897;
+            }
+
+            .songs-per-page-select:focus {
+                outline: none;
+                border-color: #ff5897;
+                box-shadow: 0 0 0 0.2rem rgba(255, 88, 151, 0.1);
             }
 
             .songs-now-playing {
@@ -150,7 +246,8 @@
 
             .songs-table {
                 width: 100%;
-                min-width: 1250px;
+                min-width: 100%;
+                table-layout: fixed;
                 border-collapse: collapse;
                 font-size: 13px;
             }
@@ -580,6 +677,20 @@
             <button type="button" class="songs-add-btn" id="openSongModal">+ Thêm Bài Hát</button>
         </div>
 
+        <div class="songs-per-page-row">
+            <form method="GET" action="{{ route('admin.songs.index') }}" style="display: flex; gap: 8px; align-items: center;">
+                <input type="hidden" name="q" value="{{ $keyword }}">
+                <label class="songs-per-page-label" for="songsPerPageSelect">Bản ghi mỗi trang:</label>
+                <select class="songs-per-page-select" id="songsPerPageSelect" name="per_page" onchange="this.form.submit()">
+                    <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                    <option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
+        </div>
+
         <div class="songs-now-playing" id="songsNowPlaying" aria-live="polite">
             <img id="songsNowCover" class="songs-now-cover" src="{{ asset('images/song-placeholder.svg') }}" alt="Now playing cover">
             <div class="songs-now-main">
@@ -666,6 +777,35 @@
                 </tbody>
             </table>
         </div>
+
+        @if($pagination && $pagination->hasPages())
+            <div class="songs-pagination-top">
+                <div class="songs-pagination-info">
+                    Hiển thị {{ $pagination->firstItem() }} đến {{ $pagination->lastItem() }} trong {{ $pagination->total() }} bản ghi
+                </div>
+                <div class="songs-pagination-controls">
+                    @if($pagination->onFirstPage())
+                        <span class="disabled">← Trước</span>
+                    @else
+                        <a href="{{ $pagination->previousPageUrl() }}" title="Trang trước">← Trước</a>
+                    @endif
+
+                    @foreach($pagination->getUrlRange(1, $pagination->lastPage()) as $page => $url)
+                        @if($page == $pagination->currentPage())
+                            <span class="active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if($pagination->hasMorePages())
+                        <a href="{{ $pagination->nextPageUrl() }}" title="Trang sau">Sau →</a>
+                    @else
+                        <span class="disabled">Sau →</span>
+                    @endif
+                </div>
+            </div>
+        @endif
     </section>
 
     <div class="song-modal-overlay" id="songModalOverlay" aria-hidden="true">

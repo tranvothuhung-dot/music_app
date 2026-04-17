@@ -20,6 +20,8 @@ class SongController extends Controller
     public function index(Request $request): View
     {
         $keyword = trim((string) $request->query('q', ''));
+        $perPage = (int) $request->query('per_page', 5);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 
         $query = DB::table('songs as s')
             ->leftJoin('artists as a', 's.artist_id', '=', 'a.artist_id')
@@ -57,9 +59,11 @@ class SongController extends Controller
             });
         }
 
-        $songs = $query
-            ->get()
-            ->map(function ($song) {
+        $songsPage = $query
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $songs = $songsPage->getCollection()->map(function ($song) {
                 return [
                     'id' => (int) $song->song_id,
                     'title' => (string) ($song->song_name ?? ''),
@@ -103,7 +107,9 @@ class SongController extends Controller
 
         return view('admin.songs', [
             'songs' => $songs,
+            'pagination' => $songsPage,
             'keyword' => $keyword,
+            'perPage' => $perPage,
             'artistsOptions' => $artistsOptions,
             'albumsOptions' => $albumsOptions,
             'genresOptions' => $genresOptions,

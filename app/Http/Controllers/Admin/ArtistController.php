@@ -16,6 +16,8 @@ class ArtistController extends Controller
     public function index(Request $request): View
     {
         $keyword = trim((string) $request->query('q', ''));
+        $perPage = (int) $request->query('per_page', 5);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 5;
 
         $query = DB::table('artists');
 
@@ -33,24 +35,27 @@ class ArtistController extends Controller
             });
         }
 
-        $artists = $query
+        $artistsPage = $query
             ->orderBy('artist_id')
-            ->get()
-            ->map(function ($artist) {
-                return [
-                    'id' => $artist->artist_id,
-                    'name' => $artist->artist_name,
-                    'bio' => $artist->bio ?? '',
-                    'avatar' => $this->resolveAvatarUrl($artist),
-                    'created_at' => !empty($artist->created_at)
-                        ? $artist->created_at
-                        : '-',
-                ];
-            });
+            ->paginate($perPage);
+
+        $artists = $artistsPage->getCollection()->map(function ($artist) {
+            return [
+                'id' => $artist->artist_id,
+                'name' => $artist->artist_name,
+                'bio' => $artist->bio ?? '',
+                'avatar' => $this->resolveAvatarUrl($artist),
+                'created_at' => !empty($artist->created_at)
+                    ? $artist->created_at
+                    : '-',
+            ];
+        });
 
         return view('admin.artists', [
             'artists' => $artists,
+            'pagination' => $artistsPage,
             'keyword' => $keyword,
+            'perPage' => $perPage,
         ]);
     }
 
