@@ -2,15 +2,21 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Controller5;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/music', [HomeController::class, 'index'])->name('music.index');
-Route::post('/timkiem', [HomeController::class, 'search'])->name('music.search');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/timkiem', [Controller5::class, 'search'])->name('music.search');
+Route::get('/search/ajax', [Controller5::class, 'ajaxSearch'])->name('search.ajax');
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Các route này CHỈ ADMIN mới vào được
+    // Route::get('/admin/dashboard', [AdminController::class, 'index']);
+    // Route::get('/admin/quan-ly-bai-hat', [AdminController::class, 'songs']);
+    // ...
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

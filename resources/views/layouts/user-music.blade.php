@@ -1268,6 +1268,20 @@
                 margin-bottom: 20px;
             }
         }
+        /* --- Bổ sung CSS cho Search Dropdown --- */
+            .dropdown-title { font-size: 11px; font-weight: 800; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+            .history-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;}
+            .history-tag { background: #f1f3f4; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #444; transition: 0.2s;}
+            .history-tag:hover { background: #e2e6ea; }
+            .history-tag .del-btn { color: #aaa; font-size: 11px; padding: 2px;}
+            .history-tag .del-btn:hover { color: #ff4081; }
+            #clearHistoryBtn { float: right; font-size: 11px; color: #ff4081; cursor: pointer; text-transform: none; font-weight: 600;}
+            .live-item { display: flex; align-items: center; padding: 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s; text-decoration: none; color: inherit;}
+            .live-item:hover { background: #f8f9fa; }
+            .live-item img { width: 40px; height: 40px; border-radius: 6px; margin-right: 12px; object-fit: cover; }
+            .live-item .info { flex-grow: 1; overflow: hidden; }
+            .live-item .title { font-weight: 600; color: #111; font-size: 14px; margin: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;}
+            .live-item .subtitle { font-size: 12px; color: #777; margin: 0; margin-top: 2px;}
     </style>
 </head>
 <body class="bg-light">
@@ -1291,19 +1305,24 @@
                 <a href="{{ route('dashboard.genres') }}" class="top-menu-link {{ request()->routeIs('dashboard.genres') ? 'active' : '' }}">Thể loại</a>
                 <a href="{{ route('dashboard.news') }}" class="top-menu-link {{ request()->routeIs('dashboard.news') ? 'active' : '' }}">Tin tức</a>
             </div>
-            <form method="POST" action="{{ route('music.search') }}" class="top-search-form">
-                @csrf
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input
-                        type="text"
-                        name="keyword"
-                        class="form-control"
-                        placeholder="Tìm bài hát, ca sĩ..."
-                        value="{{ old('keyword') }}"
-                    >
-                </div>
-            </form>
+            <div class="top-search-form position-relative">
+                <form method="GET" action="{{ route('music.search') }}" id="searchForm">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            id="searchInput" 
+                            class="form-control" 
+                            placeholder="Tìm bài hát, ca sĩ, album..." 
+                            value="{{ request()->query('q') }}" 
+                            autocomplete="off"
+                        >
+                    </div>
+                </form>
+                <div id="searchDropdown" style="display: none; position: absolute; top: 110%; left: 0; width: 100%; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1050; padding: 15px; max-height: 400px; overflow-y: auto;">
+                    </div>
+            </div>
             <div class="top-nav-actions">
                 <div class="dropdown d-flex align-items-center gap-2">
                     @php
@@ -1591,24 +1610,18 @@
 
     <div id="action-toast" class="action-toast" role="status" aria-live="polite"></div>
 
-    <div class="modal fade playlist-modal" id="addPlaylistModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm vào Playlist</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="playlist-modal-label">Chọn Playlist có sẵn:</div>
-                    <select id="playlist-select" class="form-select">
-                        <option value="">-- Chọn playlist --</option>
-                    </select>
-                    <input id="playlist-new-name" type="text" class="form-control mt-2 d-none" placeholder="Nhập tên playlist mới...">
-                    <button type="button" id="playlist-save-btn" class="playlist-modal-save">LƯU</button>
-                </div>
+    <div class="modal fade" id="loginRequireModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="modal-body text-center p-5">
+                <i class="fas fa-lock" style="font-size: 40px; color: #ff4081; margin-bottom: 20px;"></i>
+                <h4 class="fw-bold mb-3">Đăng nhập để nghe/sử dụng</h4>
+                <p class="text-muted mb-4">Bạn cần tài khoản để thưởng thức trọn vẹn và sử dụng tính năng này.</p>
+                <a href="/login" class="btn btn-primary px-5 py-2" style="background-color: #ff4081; border: none; border-radius: 25px; font-weight: bold;">Đăng nhập ngay</a>
             </div>
         </div>
     </div>
+</div>
 
     <audio id="music-audio" preload="metadata"></audio>
 
@@ -1732,6 +1745,7 @@
                     actionToast.classList.remove('show');
                 }, 1800);
             }
+            window.showToast = showToast;
 
             function updateVolumeVisual(value) {
                 if (!volumeRange) {
@@ -3005,7 +3019,7 @@
 
             function playSongById(songId, autoplay = true, sourceElement = null) {
                 const song = getSongById(songId, sourceElement);
-
+                
                 if (!song) {
                     return;
                 }
@@ -3018,6 +3032,7 @@
 
                 updatePlayer(songs[queueResult.index], autoplay);
             }
+            window.playSongById = playSongById;
 
             function playNext() {
                 if (!ensurePlaybackQueue()) {
@@ -4128,6 +4143,208 @@
             if (!restoredPlayback && !audio.src && songs.length) {
                 updatePlayer(songs[0], false);
             }
+
+            // --- BẮT ĐẦU: LOGIC TÌM KIẾM AJAX DÀNH CHO DASHBOARD (VANILLA JS) ---
+            let searchTimeout;
+            const searchInput = document.getElementById('searchInput');
+            const searchDropdown = document.getElementById('searchDropdown');
+            const searchForm = document.getElementById('searchForm');
+            const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }}; 
+
+            const HistoryManager = {
+                getKey: () => isUserLoggedIn ? 'music_search_history_auth' : 'music_search_history_guest',
+                get: function() { return JSON.parse(localStorage.getItem(this.getKey())) || []; },
+                add: function(keyword) {
+                    if(!keyword) return;
+                    let h = this.get();
+                    h = h.filter(k => k !== keyword);
+                    h.unshift(keyword);
+                    if(h.length > 5) h.pop();
+                    localStorage.setItem(this.getKey(), JSON.stringify(h));
+                },
+                remove: function(keyword) {
+                    let h = this.get().filter(k => k !== keyword);
+                    localStorage.setItem(this.getKey(), JSON.stringify(h));
+                },
+                clear: function() { localStorage.removeItem(this.getKey()); }
+            };
+
+            const DropdownUI = {
+                show: function() { 
+                    searchDropdown.style.display = 'block'; 
+                    searchDropdown.style.opacity = '0';
+                    setTimeout(() => { searchDropdown.style.opacity = '1'; searchDropdown.style.transition = 'opacity 0.2s'; }, 10);
+                },
+                hide: function() { 
+                    searchDropdown.style.opacity = '0';
+                    setTimeout(() => { searchDropdown.style.display = 'none'; }, 200);
+                },
+                renderDefault: function(trendingData) {
+                    let history = HistoryManager.get();
+                    let html = '';
+                    
+                    if (isUserLoggedIn && history.length > 0) {
+                        html += `<div class="dropdown-title">Lịch sử tìm kiếm <span id="clearHistoryBtn">Xóa tất cả</span></div>
+                                <div class="history-tags">`;
+                        history.forEach(k => {
+                            html += `<div class="history-tag" data-key="${k}">
+                                        <i class="fas fa-history"></i> <span class="h-text">${k}</span> <i class="fas fa-times del-btn"></i>
+                                    </div>`;
+                        });
+                        html += `</div>`;
+                    }
+
+                    if (trendingData && trendingData.length > 0) {
+                        html += `<div class="dropdown-title">Gợi ý thịnh hành</div>`;
+                        trendingData.forEach(song => {
+                            let imgSrc = song.song_image ? `/images/${song.song_image}` : 'https://via.placeholder.com/40';
+                            let views = song.view_count >= 1000000 ? (song.view_count/1000000).toFixed(1) + 'M' : 
+                                        (song.view_count >= 1000 ? (song.view_count/1000).toFixed(1) + 'K' : song.view_count);
+                            
+                            html += `
+                            <div class="live-item suggestion-item" data-id="${song.song_id}">
+                                <img src="${imgSrc}">
+                                <div class="info">
+                                    <p class="title">${song.song_name}</p>
+                                    <p class="subtitle">${song.artist_name} • <i class="fas fa-headphones" style="font-size:10px;"></i> ${views}</p>
+                                </div>
+                            </div>`;
+                        });
+                    }
+                    searchDropdown.innerHTML = html;
+                },
+                renderLiveSearch: function(data) {
+                    let html = '';
+                    if(data.artists && data.artists.length > 0) {
+                        html += `<div class="dropdown-title">Nghệ sĩ</div>`;
+                        data.artists.forEach(a => {
+                            let imgSrc = a.avatar_image ? `/images/${a.avatar_image}` : 'https://via.placeholder.com/40';
+                            html += `
+                            <a href="{{ route('music.search') }}?q=${encodeURIComponent(a.artist_name)}" class="live-item text-decoration-none">
+                                <img src="${imgSrc}" style="border-radius: 50%;">
+                                <div class="info"><p class="title">${a.artist_name}</p></div>
+                            </a>`;
+                        });
+                    }
+                    if(data.albums && data.albums.length > 0) {
+                        html += `<div class="dropdown-title mt-3">Album</div>`;
+                        data.albums.forEach(al => {
+                            let imgSrc = al.cover_image ? `/images/${al.cover_image}` : 'https://via.placeholder.com/40';
+                            html += `
+                            <a href="{{ route('music.search') }}?q=${encodeURIComponent(al.album_name)}" class="live-item text-decoration-none">
+                                <img src="${imgSrc}" style="border-radius: 6px;">
+                                <div class="info"><p class="title">${al.album_name}</p></div>
+                            </a>`;
+                        });
+                    }
+                    if(data.songs && data.songs.length > 0) {
+                        html += `<div class="dropdown-title mt-3">Bài hát</div>`;
+                        data.songs.forEach(s => {
+                            let imgSrc = s.song_image ? `/images/${s.song_image}` : 'https://via.placeholder.com/40';
+                            html += `
+                            <div class="live-item suggestion-item" data-id="${s.song_id}">
+                                <img src="${imgSrc}">
+                                <div class="info">
+                                    <p class="title">${s.song_name}</p>
+                                    <p class="subtitle">${s.artist_name}</p>
+                                </div>
+                            </div>`;
+                        });
+                    }
+                    if(html === '') html = '<div class="text-center text-muted py-3 small">Không tìm thấy kết quả</div>';
+                    searchDropdown.innerHTML = html;
+                }
+            };
+
+            if(searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    let q = this.value.trim();
+                    if(q === '') fetchDefault();
+                    else fetchLive(q);
+                    DropdownUI.show();
+                });
+
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    let q = this.value.trim();
+                    if(q === '') { fetchDefault(); return; }
+                    searchTimeout = setTimeout(() => fetchLive(q), 300);
+                });
+            }
+
+            function fetchDefault() {
+                fetch("{{ route('search.ajax') }}", { headers: { 'Accept': 'application/json' }})
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.type === 'trending') DropdownUI.renderDefault(res.data);
+                    }).catch(e => console.error(e));
+            }
+
+            function fetchLive(q) {
+                fetch(`{{ route('search.ajax') }}?q=${encodeURIComponent(q)}`, { headers: { 'Accept': 'application/json' }})
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.type === 'search') DropdownUI.renderLiveSearch(res);
+                    }).catch(e => console.error(e));
+            }
+
+            if(searchForm) {
+                searchForm.addEventListener('submit', function() {
+                    let q = searchInput.value.trim();
+                    if(q) HistoryManager.add(q);
+                });
+            }
+
+            // Gắn event delegation chung cho toàn document
+            document.addEventListener('click', function(e) {
+                // Click vào chữ lịch sử
+                const hText = e.target.closest('.history-tag .h-text');
+                if (hText) {
+                    let q = hText.closest('.history-tag').getAttribute('data-key');
+                    searchInput.value = q;
+                    searchForm.submit();
+                    return;
+                }
+
+                // Click xóa 1 item lịch sử
+                const delBtn = e.target.closest('.del-btn');
+                if (delBtn) {
+                    e.stopPropagation();
+                    HistoryManager.remove(delBtn.closest('.history-tag').getAttribute('data-key'));
+                    fetchDefault();
+                    return;
+                }
+
+                // Click xóa tất cả lịch sử
+                if (e.target.id === 'clearHistoryBtn') {
+                    HistoryManager.clear();
+                    fetchDefault();
+                    return;
+                }
+
+                // Click bài hát gợi ý
+                const suggestion = e.target.closest('.suggestion-item');
+                if (suggestion) {
+                    DropdownUI.hide();
+                    if(!isUserLoggedIn) {
+                        const modalEl = document.getElementById('loginRequireModal');
+                        if(modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                        return;
+                    }
+                    
+                    let songId = suggestion.getAttribute('data-id');
+                    if(songId && typeof window.playSongById === 'function') {
+                        window.playSongById(songId, true); 
+                        searchInput.value = ''; 
+                    }
+                    return;
+                }
+
+                // Click ra ngoài thanh tìm kiếm -> Ẩn dropdown
+                if (!e.target.closest('.top-search-form')) {
+                    DropdownUI.hide();
+                }
+            });
         });
     </script>
 </body>

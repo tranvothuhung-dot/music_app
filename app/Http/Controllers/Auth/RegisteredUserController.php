@@ -9,9 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -26,23 +24,57 @@ class RegisteredUserController extends Controller
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
+        // 1. Validate dữ liệu từ form cực kỳ chặt chẽ
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'full_name' => ['required', 'string', 'max:150'],
+            'username'  => [
+                'required', 
+                'string', 
+                'min:3',
+                'max:50', 
+                'unique:users,username',
+                'regex:/^[a-zA-Z0-9_]+$/' // Chỉ cho phép chữ không dấu, số và gạch dưới
+            ],
+            'email'     => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'email', 
+                'max:100', 
+                'unique:users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/' // Bắt buộc đúng đuôi email
+            ],
+            'password'  => [
+                'required', 
+                'confirmed', 
+                \Illuminate\Validation\Rules\Password::min(8) // 8 ký tự
+            ],
+            'birth_day' => ['required', 'date'],
+            'gender'    => ['required', 'in:male,female,other'],
+        ], [
+            // Thông báo lỗi tùy chỉnh 
+            'username.regex' => 'Username chỉ được chứa chữ cái không dấu, số và dấu gạch dưới.',
+            'username.unique' => 'Tên đăng nhập này đã có người sử dụng.',
+            'username.min' => 'Username phải có ít nhất 3 ký tự.',
+            'email.regex' => 'Email phải có định dạng đầy đủ (VD: example@gmail.com).',
+            'email.unique' => 'Email này đã được đăng ký.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            'birth_day.required' => 'Vui lòng nhập ngày sinh.'
         ]);
 
+        // 2. Lưu vào DB
         $user = User::create([
-            'full_name' => $request->name,
-            'username' => $this->generateUsername($request->name),
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'gender' => 'other', // default gender
+            'full_name' => $request->full_name,
+            'username'  => $request->username,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
+            'birth_day' => $request->birth_day,
+            'gender'    => $request->gender,
+            'role_id'   => 2, // Mặc định 2 là User
         ]);
 
         event(new Registered($user));
@@ -50,22 +82,5 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
-    }
-
-    /**
-     * Generate a unique username from name.
-     */
-    private function generateUsername(string $name): string
-    {
-        $baseUsername = Str::slug($name, '');
-        $username = $baseUsername;
-        $counter = 1;
-
-        while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $counter;
-            $counter++;
-        }
-
-        return $username;
     }
 }
