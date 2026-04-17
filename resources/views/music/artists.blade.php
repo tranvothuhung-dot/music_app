@@ -9,7 +9,7 @@
             font-size: 38px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #2b2b2b;
+            color: var(--primary-color);
             border-left: 6px solid #f82c75;
             padding-left: 16px;
             line-height: 1.2;
@@ -19,21 +19,30 @@
         /* Thêm hiệu ứng hover cho thẻ nghệ sĩ giống trang Album */
         .artist-card {
             transition: transform 0.25s ease, box-shadow 0.25s ease;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0;
         }
         
         .artist-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
         }
 
         /* Bo tròn ảnh nghệ sĩ ngoài danh sách */
         .artist-avatar-box {
-            padding: 20px 20px 0 20px;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 18px;
+            overflow: hidden;
+            border-radius: 50%;
+            background: transparent;
         }
         
         .artist-avatar-box img {
             width: 100%;
-            aspect-ratio: 1/1;
+            height: 100%;
             object-fit: cover;
             border-radius: 50%; /* Hình tròn đặc trưng của nghệ sĩ */
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -42,6 +51,11 @@
 
         .artist-card:hover .artist-avatar-box img {
             transform: scale(1.05);
+        }
+
+        .artist-card .card-body {
+            background: transparent;
+            padding: 0 0 1rem;
         }
     </style>
 
@@ -75,9 +89,9 @@
                             <h5 class="card-title mb-1">
                                 <a href="{{ route('music.artist', $artistId) }}" class="text-dark text-decoration-none">{{ $artist->artist_name }}</a>
                             </h5>
-                            <p class="card-text text-muted mb-3">Nghệ sĩ</p>
                             
-                            <a href="{{ route('music.artist', $artistId) }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill">Xem nghệ sĩ</a>
+                            
+                    
                         </div>
                         
                     </div>

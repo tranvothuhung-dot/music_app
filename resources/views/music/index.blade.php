@@ -134,7 +134,7 @@
         <section class="mb-5">
             <div class="section-heading">
                 <h2 class="title-highlight">Nghệ Sĩ Nổi Bật</h2>
-                <a href="">Xem tất cả</a>
+                <a href="{{ route('music.artists') }}">Xem tất cả</a>
             </div>
             <div class="row">
                 @forelse($featuredArtists as $artist)
@@ -163,7 +163,7 @@
         <section class="mb-5">
             <div class="section-heading">
                 <h2 class="title-highlight">Tin Tức</h2>
-                <a href="">Xem tất cả</a>
+                <a href="{{ route('music.news') }}">Xem tất cả</a>
             </div>
             <div class="row g-4">
                 @forelse($news as $item)
@@ -185,7 +185,7 @@
                                 <div class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i> Công viên Văn hóa Lớn, TP. Hồ Chí Minh</div>
                                 
                                 @guest
-                                    <button class="btn-news-detail" data-bs-toggle="modal" data-bs-target="#requireLoginModal">Xem chi tiết</button>
+                                    <button type="button" class="btn-news-detail restricted-action" data-bs-toggle="modal" data-bs-target="#requireLoginModal" onclick="if (!window.isAuthenticated) { bootstrap.Modal.getOrCreateInstance(document.getElementById('requireLoginModal')).show(); return false; }">Xem chi tiết</button>
                                 @else
                                     <a href="#" class="btn-news-detail">Xem chi tiết</a>
                                 @endguest

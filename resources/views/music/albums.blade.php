@@ -9,7 +9,7 @@
             font-size: 38px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #2b2b2b;
+            color: var(--primary-color);
             border-left: 6px solid #f82c75;
             padding-left: 16px;
             line-height: 1.2;
@@ -59,7 +59,7 @@
                             </h5>
                             <p class="card-text text-muted mb-3">{{ $album->artist_name ?? 'Nghệ sĩ chưa rõ' }}</p>
                             
-                            <a href="{{ route('music.album', $albumId) }}" class="btn btn-sm btn-outline-primary">Xem album</a>
+                            <a href="{{ route('music.album', $albumId) }}" class="btn btn-sm btn-outline-pink">Xem album</a>
                         </div>
                     </div>
                 </div>

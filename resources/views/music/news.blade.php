@@ -10,7 +10,7 @@
             font-size: 38px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #2b2b2b;
+            color: var(--primary-color);
             border-left: 6px solid #f82c75;
             padding-left: 16px;
             line-height: 1.2;
@@ -165,7 +165,11 @@
                                 <span>{{ $item->location ?? 'Công viên Văn hóa Lớn, TP. Hồ Chí Minh' }}</span>
                             </div>
 
-                            <a href="#" class="btn-pink">Xem chi tiết</a>
+                            @guest
+                                <button type="button" class="btn-pink restricted-action" data-bs-toggle="modal" data-bs-target="#requireLoginModal" onclick="if (!window.isAuthenticated) { bootstrap.Modal.getOrCreateInstance(document.getElementById('requireLoginModal')).show(); return false; }">Xem chi tiết</button>
+                            @else
+                                <a href="#" class="btn-pink">Xem chi tiết</a>
+                            @endguest
                         </div>
                         
                     </div>

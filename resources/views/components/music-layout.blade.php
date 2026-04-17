@@ -7,11 +7,10 @@
     <link rel="stylesheet" href="{{ asset('library/bootstrap.min.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <script src="{{ asset('library/jquery.slim.min.js') }}"></script>
+    <script src="{{ asset('library/jquery-3.7.1.js') }}"></script>
     <script src="{{ asset('library/popper.min.js') }}"></script>
     <script src="{{ asset('library/bootstrap.bundle.min.js') }}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="{{ asset('library/jquery-3.7.1.js') }}"></script>
     <style>
         :root {
             --primary-color: #ff4081;
@@ -235,6 +234,7 @@
         }
 
         .guest-login-modal .modal-content {
+            font-family: 'Poppins', sans-serif;
             border-radius: 32px;
             overflow: hidden;
             background: #ffffff;
@@ -275,8 +275,8 @@
         }
 
         .guest-login-modal .modal-title {
-            font-size: 1.35rem;
-            font-weight: 800;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #ff4081;
             letter-spacing: -0.01em;
             display: flex;
@@ -286,7 +286,7 @@
         }
 
         .guest-login-modal .modal-title i {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
         .guest-login-modal .modal-body {
@@ -309,19 +309,20 @@
         }
 
         .guest-login-modal .modal-body h5 {
-            font-size: 1.3rem;
-            font-weight: 800;
+            font-size: 1.15rem;
+            font-weight: 700;
             color: #111827;
             margin-bottom: 0.75rem;
             letter-spacing: -0.01em;
-            line-height: 1.3;
+            line-height: 1.45;
         }
 
         .guest-login-modal .modal-body p {
-            font-size: 0.95rem;
-            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #4b5563;
             margin-bottom: 0;
-            line-height: 1.5;
+            line-height: 1.75;
         }
 
         .guest-login-modal .modal-footer {
@@ -333,6 +334,7 @@
         }
 
         .guest-login-modal .btn {
+            font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             font-weight: 700;
             padding: 0.9rem 2.5rem;
@@ -375,7 +377,7 @@
             font-size: 2.4rem;
             font-weight: 700;
             letter-spacing: -0.04em;
-            color: #2b2b2b;
+            color: var(--primary-color);
             border-left: 6px solid var(--primary-color);
             padding-left: 16px;
             line-height: 1.15;
@@ -404,6 +406,15 @@
         .section-heading a:hover {
             color: var(--primary-color);
             transform: translateX(2px);
+        }
+
+        .section-title,
+        .card-title,
+        .artist-title,
+        .album-title,
+        .genre-title,
+        .news-card .card-title {
+            color: var(--primary-color);
         }
 
         .card {
@@ -691,6 +702,66 @@
             backdrop-filter: blur(5px);
             z-index: 10;
         }
+
+        footer {
+            background-color: #ffffff;
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+        .footer-heading {
+            color: #222;
+            font-weight: 700;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .footer-link {
+            color: #666;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+        .footer-link:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f3f4;
+            color: #555;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .social-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        .footer-subscribe-btn {
+            background: #f82c75;
+            color: #fff;
+            border: none;
+            min-width: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .footer-subscribe-btn:hover {
+            background: #e01d67;
+            color: #fff;
+        }
+        .footer-subscribe-btn i {
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -756,29 +827,29 @@
         @endif
     </header>
 
-    <div class="modal fade guest-login-modal" id="guestLoginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header">
-                    <div class="modal-title" id="guestLoginModalLabel">
-                        <i class="fas fa-lock"></i>Yêu cầu quyền truy cập
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade guest-login-modal" id="playConfirmModal" tabindex="-1" aria-labelledby="playConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <div class="modal-title" id="playConfirmLabel">
+                    <i class="fas fa-lock"></i>Yêu cầu quyền truy cập
                 </div>
-                <div class="modal-body">
-                    <div class="modal-icon">
-                        <i class="fas fa-headphones"></i>
-                    </div>
-                    <h5>Bạn cần đăng nhập để nghe bài hát này.</h5>
-                    <p>Vui lòng đăng nhập hoặc tạo tài khoản mới.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <i class="fas fa-headphones"></i>
                 </div>
-                <div class="modal-footer">
-                    <a href="{{ route('login') }}" class="btn btn-pink">Đăng Nhập</a>
-                    <a href="{{ route('register') }}" class="btn btn-outline-pink">Đăng Ký</a>
-                </div>
+                <h5>Bạn cần đăng nhập để nghe bài hát này.</h5>
+                <p>Vui lòng đăng nhập hoặc tạo tài khoản mới.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ route('login') }}" class="btn btn-pink">Đăng Nhập</a>
+                <a href="{{ route('register') }}" class="btn btn-outline-pink">Đăng Ký</a>
             </div>
         </div>
     </div>
+</div>
 
     <x-login-required-modal />
 
@@ -811,6 +882,56 @@
         {{ $slot }}
     </main>
 
+    <footer class="pt-5 pb-3 border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <a href="{{ url('/music') }}" class="d-flex align-items-center text-decoration-none mb-3">
+                        <span class="fs-4 fw-bold text-dark">MusicApp</span>
+                    </a>
+                    <p class="text-muted small pe-4">
+                        Thế giới âm nhạc trong tầm tay. Nghe nhạc chất lượng cao, cập nhật xu hướng mới nhất mỗi ngày.
+                    </p>
+                    <div class="mt-3">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-3 mb-4">
+                    <h6 class="footer-heading">Khám phá</h6>
+                    <a href="{{ route('music.index') }}" class="footer-link">Trang chủ</a>
+                    <a href="{{ route('music.songs') }}" class="footer-link">Bài hát mới</a>
+                    <a href="{{ route('music.albums') }}" class="footer-link">Album Hot</a>
+                    <a href="{{ route('music.artists') }}" class="footer-link">Nghệ sĩ</a>
+                </div>
+
+                <div class="col-lg-2 col-md-3 mb-4">
+                    <h6 class="footer-heading">Hỗ trợ</h6>
+                    <a href="#" class="footer-link">Điều khoản</a>
+                    <a href="#" class="footer-link">Bảo mật</a>
+                    <a href="#" class="footer-link">Liên hệ</a>
+                    <a href="#" class="footer-link">Góp ý</a>
+                </div>
+
+                <div class="col-lg-4 col-md-12 mb-4">
+                    <h6 class="footer-heading">Đăng ký nhận tin</h6>
+                    <form class="input-group">
+                        <input type="email" class="form-control bg-light" placeholder="Email của bạn...">
+                        <button class="btn footer-subscribe-btn" type="button"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="text-center text-muted small">
+                &copy; {{ date('Y') }} <strong>MusicApp</strong>. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
     <script>
         window.isAuthenticated = @json(auth()->check());
         document.addEventListener('DOMContentLoaded', function () {
@@ -818,7 +939,7 @@
                 button.addEventListener('click', function (event) {
                     if (!window.isAuthenticated) {
                         event.preventDefault();
-                        var modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
+                        var modal = new bootstrap.Modal(document.getElementById('requireLoginModal'));
                         modal.show();
                     }
                 });
@@ -847,10 +968,10 @@
                 }
             });
 
-            var modalCloseButton = document.querySelector('#guestLoginModal .btn-close');
+            var modalCloseButton = document.querySelector('#requireLoginModal .btn-close');
             if (modalCloseButton) {
                 modalCloseButton.addEventListener('click', function () {
-                    var modalEl = document.getElementById('guestLoginModal');
+                    var modalEl = document.getElementById('requireLoginModal');
                     if (modalEl && window.bootstrap && bootstrap.Modal) {
                         var instance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
                         instance.hide();

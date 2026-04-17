@@ -170,6 +170,62 @@
         .navbar-nav .nav-link.active:hover {
             color: #f82c75 !important; /* Hover thì ra màu hồng */
         }
+
+        /* --- CSS Hiệu ứng Hover Play cho Bài hát --- */
+        .song-cover-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            margin-right: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .song-cover-wrapper .song-cover-sm {
+            width: 100%;
+            height: 100%;
+            margin-right: 0; /* Ghi đè margin cũ */
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        .song-play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none; /* QUAN TRỌNG: Giúp click xuyên qua lớp đen */
+        }
+
+        /* Nổi overlay khi hover vào toàn bộ hàng bài hát */
+        .song-item:hover .song-play-overlay {
+            opacity: 1;
+        }
+
+        .song-play-icon {
+            width: 28px;
+            height: 28px;
+            background-color: #f82c75; /* Màu hồng */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            padding-left: 2px;
+            box-shadow: 0 4px 10px rgba(248, 44, 117, 0.4);
+            transform: scale(0.8);
+            transition: transform 0.2s ease;
+        }
+
+        .song-item:hover .song-play-icon {
+            transform: scale(1);
+        }
     </style>
 
     <div class="container py-4 container-genre">
@@ -195,7 +251,7 @@
                     <div class="genre-count">{{ count($songs) }} bài hát</div>
 
                     @guest
-                        <button class="btn-play-all" data-bs-toggle="modal" data-bs-target="#requireLoginModal">
+                        <button type="button" class="btn-play-all restricted-action" data-bs-toggle="modal" data-bs-target="#requireLoginModal" onclick="if (!window.isAuthenticated) { bootstrap.Modal.getOrCreateInstance(document.getElementById('requireLoginModal')).show(); return false; }">
                             <i class="fas fa-play"></i> Phát Nhạc Ngay
                         </button>
                     @else
@@ -204,7 +260,7 @@
                                 <i class="fas fa-play"></i> Phát Nhạc Ngay
                             </a>
                         @else
-                            <button class="btn-play-all" disabled style="opacity: 0.6; cursor: not-allowed;">
+                            <button type="button" class="btn-play-all" disabled style="opacity: 0.6; cursor: not-allowed;">
                                 <i class="fas fa-play"></i> Phát Nhạc Ngay
                             </button>
                         @endif
@@ -223,25 +279,28 @@
                         @endphp
                         
                         @guest
-                            <div class="song-item" data-bs-toggle="modal" data-bs-target="#requireLoginModal">
+                            <a href="javascript:void(0)" class="song-item restricted-action" data-bs-toggle="modal" data-bs-target="#requireLoginModal" onclick="if (!window.isAuthenticated) { bootstrap.Modal.getOrCreateInstance(document.getElementById('requireLoginModal')).show(); return false; }">
                         @else
                             <a href="{{ route('music.song', ['id' => $songId]) }}" class="song-item">
                         @endguest
                         
                             <div class="song-num">{{ $idx + 1 }}</div>
-                            <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
+                            
+                            <div class="song-cover-wrapper">
+                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
+                                <div class="song-play-overlay">
+                                    <div class="song-play-icon">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="song-info">
                                 <p class="song-name">{{ $song->song_name }}</p>
                                 <p class="song-artist">{{ $song->artist_name ?? 'Nghệ sĩ chưa rõ' }}</p>
                             </div>
                             
-                        @guest
-                            </div>
-                        @else
-                            </a>
-                        @endguest
-                        
-                    @endforeach
+                        </a> @endforeach
                 @else
                     <div class="alert alert-info border-0 shadow-sm rounded-3">Thể loại này chưa có bài hát nào.</div>
                 @endif
