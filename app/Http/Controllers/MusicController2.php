@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class HomeController extends Controller
+class MusicController2 extends Controller
 {
     public function index()
     {
@@ -19,7 +19,8 @@ class HomeController extends Controller
 
         $newReleases = DB::table('songs as s')
             ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
-            ->select('s.*', 'a.artist_name')
+            ->leftJoin('danh_muc_am_nhac as g', 's.genre_id', '=', 'g.id')
+            ->select('s.*', 'a.artist_name', 'g.ten_danh_muc as genre_name')
             ->orderByDesc('s.created_at')
             ->limit(8)
             ->get();
@@ -36,6 +37,11 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        $genres = collect();
+        if (Schema::hasTable('danh_muc_am_nhac')) {
+            $genres = DB::table('danh_muc_am_nhac')->limit(4)->get();
+        }
+
         $news = [];
         if (Schema::hasTable('news')) {
             $news = DB::table('news')
@@ -49,27 +55,8 @@ class HomeController extends Controller
             'newReleases' => $newReleases,
             'featuredAlbums' => $featuredAlbums,
             'featuredArtists' => $featuredArtists,
+            'genres' => $genres,
             'news' => $news,
-        ]);
-    }
-
-    public function category($id)
-    {
-        $category = DB::table('danh_muc_am_nhac')->find($id);
-
-        if (! $category) {
-            abort(404);
-        }
-
-        $songs = DB::table('songs as s')
-            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
-            ->select('s.*', 'a.artist_name')
-            ->where('s.genre_id', $id)
-            ->get();
-
-        return view('music.category', [
-            'category' => $category,
-            'songs' => $songs,
         ]);
     }
 
@@ -82,6 +69,41 @@ class HomeController extends Controller
 
         return view('music.songs', [
             'songs' => $songs,
+        ]);
+    }
+
+    public function songDetail($id)
+    {
+        $song = null;
+
+        try {
+            $song = DB::table('songs as s')
+                ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+                ->select('s.*', 'a.artist_name')
+                ->where('s.song_id', $id)
+                ->first();
+        } catch (\Throwable $e) {
+            // fallback when schema uses id instead of song_id
+        }
+
+        if (! $song) {
+            try {
+                $song = DB::table('songs as s')
+                    ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+                    ->select('s.*', 'a.artist_name')
+                    ->where('s.id', $id)
+                    ->first();
+            } catch (\Throwable $e) {
+                // ignore schema mismatch
+            }
+        }
+
+        if (! $song) {
+            abort(404);
+        }
+
+        return view('music.song-detail', [
+            'song' => $song,
         ]);
     }
 
@@ -106,6 +128,14 @@ class HomeController extends Controller
         ]);
     }
 
+    public function genres()
+    {
+        $genres = DB::table('danh_muc_am_nhac')->get();
+
+        return view('music.genres', [
+            'genres' => $genres,
+        ]);
+    }
 
     public function news()
     {
@@ -156,6 +186,75 @@ class HomeController extends Controller
             'songs' => $songs,
             'artists' => $artists,
             'albums' => $albums,
+        ]);
+    }
+
+    public function albumDetail($id)
+    {
+        $album = DB::table('albums as al')
+            ->join('artists as a', 'al.artist_id', '=', 'a.artist_id')
+            ->select('al.*', 'a.artist_name')
+            ->where('al.album_id', $id)
+            ->first();
+
+        if (!$album) {
+            abort(404);
+        }
+
+        $songs = DB::table('songs as s')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->select('s.*', 'a.artist_name')
+            ->where('s.album_id', $album->album_id)
+            ->get();
+
+        return view('music.album-detail', [
+            'album' => $album,
+            'songs' => $songs,
+        ]);
+    }
+
+    public function artistDetail($id)
+    {
+        $artist = DB::table('artists')
+            ->where('artist_id', $id)
+            ->orWhere('id', $id)
+            ->first();
+
+        if (!$artist) {
+            abort(404);
+        }
+
+        $songs = DB::table('songs as s')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->select('s.*', 'a.artist_name')
+            ->where('s.artist_id', $artist->artist_id ?? $artist->id)
+            ->get();
+
+        return view('music.artist-detail', [
+            'artist' => $artist,
+            'songs' => $songs,
+        ]);
+    }
+
+    public function genreDetail($id)
+    {
+        $genre = DB::table('danh_muc_am_nhac')
+            ->where('id', $id)
+            ->first();
+
+        if (!$genre) {
+            abort(404);
+        }
+
+        $songs = DB::table('songs as s')
+            ->join('artists as a', 's.artist_id', '=', 'a.artist_id')
+            ->select('s.*', 'a.artist_name')
+            ->where('s.genre_id', $genre->id)
+            ->get();
+
+        return view('music.genre-detail', [
+            'genre' => $genre,
+            'songs' => $songs,
         ]);
     }
 }
