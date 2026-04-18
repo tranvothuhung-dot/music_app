@@ -1,68 +1,82 @@
-@extends('layouts.user-music')
+<x-music-layout>
+    <x-slot name="title">Bài hát</x-slot>
 
-@section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="section-title m-0">Bài Hát</h2>
-        <span class="badge bg-light text-dark border">{{ $songs->total() }} bài</span>
-    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4 mb-4">
-        @forelse($songs as $song)
-            <div class="col">
-                <div
-                    class="card custom-card song-card h-100"
-                    data-song-card
-                    data-song-id="{{ $song->song_id }}"
-                    data-song-name="{{ e($song->song_name) }}"
-                    data-song-artist="{{ e($song->artist_name) }}"
-                    data-song-image="{{ asset('images/'.$song->song_image) }}"
-                    data-song-url="{{ $song->song_url }}"
-                    data-song-duration="{{ $song->duration }}"
-                    data-song-album-id="{{ $song->album_id ?? '' }}"
-                    data-song-artist-id="{{ $song->artist_id }}"
-                >
-                    <div class="card-img-wrapper">
-                        <img src="{{ asset('images/'.$song->song_image) }}" onerror="this.src='https://via.placeholder.com/300'" alt="{{ $song->song_name }}">
-                        <div class="play-overlay">
-                            <button type="button" class="btn-play-circle" data-action="play" data-song-id="{{ $song->song_id }}">
-                                <i class="fas fa-play ms-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="overflow-hidden flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-truncate">{{ $song->song_name }}</h6>
-                                <small class="text-muted d-block text-truncate">{{ $song->artist_name }}</small>
-                                <small class="text-muted d-block mt-2">{{ gmdate('i:s', (int) $song->duration) }}</small>
+    <style>
+        .title-highlight {
+            font-family: 'Poppins', sans-serif;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--primary-color);
+            border-left: 6px solid #f82c75;
+            padding-left: 16px;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        /* Đảm bảo lớp overlay đen và icon play không cản trở cú click chuột */
+        .play-overlay {
+            pointer-events: none !important; 
+        }
+        .music-card:hover .play-overlay {
+            pointer-events: none !important;
+        }
+        
+        /* Hiệu ứng đổi màu tên bài hát khi hover */
+        .card-title {
+            color: #2b2b2b;
+            transition: color 0.2s ease;
+        }
+        .music-card:hover .card-title {
+            color: #f82c75;
+        }
+    </style>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="title-highlight">Kho Bài Hát</h1>
+            </div>
+        </div>
+
+        <div class="row g-4"> @forelse($songs as $song)
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    @php
+                        $songImage = $song->image ?? $song->song_image ?? (isset($song->new_image) ? $song->new_image : null);
+                        $songId = $song->song_id ?? $song->id ?? 0;
+                    @endphp
+
+                    <div class="card h-100 shadow-sm border-0 music-card">
+                        
+                        @guest
+                            <a href="javascript:void(0)" class="text-decoration-none restricted-action" data-bs-toggle="modal" data-bs-target="#requireLoginModal" onclick="if (!window.isAuthenticated) { bootstrap.Modal.getOrCreateInstance(document.getElementById('requireLoginModal')).show(); return false; }">
+                        @else
+                            <a href="{{ route('music.song', ['id' => $songId]) }}" class="text-decoration-none">
+                        @endguest
+
+                            <div class="card-img-wrapper">
+                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
+                                <div class="play-overlay">
+                                    <div class="btn-play-circle">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="dropdown ms-2">
-                                <button class="btn btn-link text-secondary p-0 btn-song-menu" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 overflow-hidden">
-                                    <li><button class="dropdown-item py-2" type="button" data-action="play" data-song-id="{{ $song->song_id }}"><i class="fas fa-play me-2 text-primary"></i> Phát ngay</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="like" data-song-id="{{ $song->song_id }}"><i class="fas fa-heart me-2 text-danger"></i> Thêm vào yêu thích</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="queue" data-song-id="{{ $song->song_id }}"><i class="fas fa-list-ul me-2 text-secondary"></i> Thêm vào hàng đợi</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="playlist" data-song-id="{{ $song->song_id }}"><i class="fas fa-plus-square me-2 text-secondary"></i> Thêm vào Playlist</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="album" data-song-id="{{ $song->song_id }}" data-album-id="{{ $song->album_id ?? '' }}"><i class="fas fa-record-vinyl me-2 text-secondary"></i> Đi tới album</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="artist" data-song-id="{{ $song->song_id }}" data-artist-id="{{ $song->artist_id }}"><i class="fas fa-user me-2 text-secondary"></i> Đi tới ca sĩ</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="share" data-song-id="{{ $song->song_id }}" data-song-name="{{ e($song->song_name) }}" data-song-artist="{{ e($song->artist_name) }}"><i class="fas fa-share me-2 text-secondary"></i> Chia sẻ</button></li>
-                                    <li><button class="dropdown-item py-2" type="button" data-action="copy-link" data-song-id="{{ $song->song_id }}"><i class="fas fa-link me-2 text-secondary"></i> Sao chép liên kết</button></li>
-                                </ul>
+                            
+                            <div class="card-body text-center">
+                                <h5 class="card-title mb-1 text-truncate">{{ $song->song_name }}</h5>
+                                <p class="card-text text-muted mb-0 text-truncate">{{ $song->artist_name ?? 'Nghệ sĩ chưa rõ' }}</p>
                             </div>
-                        </div>
-                    </div>
+
+                        </a> </div>
                 </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <div class="alert alert-light border text-muted">Không có bài hát nào.</div>
-            </div>
-        @endforelse
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-info border-0 shadow-sm rounded-3">Chưa có bài hát nào trong hệ thống.</div>
+                </div>
+            @endforelse
+        </div>
     </div>
-
-    <div class="d-flex justify-content-center">
-        {{ $songs->links() }}
-    </div>
-@endsection
+</x-music-layout>

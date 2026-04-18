@@ -1,4 +1,4 @@
-@extends('layouts.user-music')
+@extends(auth()->check() ? 'layouts.user-music' : 'components.music-layout')
 
 @section('content')
 <style>
@@ -202,70 +202,50 @@
     @endif
 </div>
 
+
+@if(!auth()->check())
+    @include('components.login-required-modal')
+@endif
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Logic lọc Album/Bài hát/Nghệ sĩ
-        const chips = document.querySelectorAll('.filter-chip');
-        chips.forEach(chip => {
-            chip.addEventListener('click', function() {
-                chips.forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
+    
+    const isLogged = {{ auth()->check() ? 'true' : 'false' }};
 
-                const filter = this.dataset.filter;
-                const sections = document.querySelectorAll('.result-section');
-
-                sections.forEach(sec => {
-                    if (filter === 'all') {
-                        sec.style.display = 'flex';
-                    } else {
-                        sec.style.display = (sec.id === 'section-' + filter) ? 'flex' : 'none';
-                    }
-                });
-            });
-        });
-
-        // 2. Click vào bài hát để nghe (chỉ khi đã đăng nhập)
-        const isLogged = {{ auth()->check() ? 'true' : 'false' }};
-        document.querySelectorAll('.song-bar').forEach(bar => {
-            bar.addEventListener('click', function(e) {
-                // Nếu click vào nút menu (...) thì không phát nhạc
-                if (e.target.closest('.dropdown')) return;
-
-                if (!isLogged) {
-                    showLoginModal();
-                    return;
-                }
-                
-                // Hàm playSongById đã có sẵn trong Layout JS
-                if (typeof window.playSongById === 'function') {
-                    window.playSongById(this.dataset.songId, true, this);
-                }
-            });
-        });
+    $(document).ready(function() {
         
-        // Kích hoạt việc tự động bôi đỏ icon yêu thích nếu bài hát đã được like trước đó
-        if (typeof window.refreshLikeActionButtons === 'function') {
-            window.refreshLikeActionButtons();
-        }
-    });
-
-    // 3. Thông báo Copy Link dùng Toast có sẵn trong Layout
-    function handleCopyLink(url) {
-        navigator.clipboard.writeText(url).then(() => {
-            if (typeof window.showToast === 'function') {
-                window.showToast('Đã sao chép liên kết bài hát', 'success');
+        // --- CHỨC NĂNG LỌC (FILTER) ---
+        $('.filter-chip').on('click', function() {
+            // Xóa active hiện tại, gán active cho nút vừa bấm
+            $('.filter-chip').removeClass('active');
+            $(this).addClass('active');
+            
+            let filter = $(this).data('filter');
+            
+            if (filter === 'all') {
+                $('.result-section').show(); // Hiện tất cả
             } else {
-                alert('Đã sao chép liên kết!');
+                $('.result-section').hide(); // Ẩn tất cả
+                $('#section-' + filter).show(); // Chỉ hiện section tương ứng
             }
         });
-    }
 
-    function showLoginModal() {
-        const modalEl = document.getElementById('loginRequireModal');
-        if (modalEl) {
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-        }
-    }
+        // --- CHỐT CHẶN MODAL BÀI HÁT ---
+        $(document).on('click', '.song-bar', function(e) {
+            // Bỏ qua nếu khách click vào nút 3 chấm (...)
+            if ($(e.target).closest('.dropdown').length) return;
+
+            if (!isLogged) {
+                e.preventDefault();
+                
+                $('#requireLoginModal').modal('show');
+                return;
+            }
+
+            // Nếu là User -> Play nhạc
+            if (typeof window.playSongById === 'function') {
+                window.playSongById($(this).data('song-id'), true, this);
+            }
+        });
+    });
 </script>
 @endsection

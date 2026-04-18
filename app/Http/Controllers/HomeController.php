@@ -166,7 +166,7 @@ class HomeController extends Controller
             ->select('s.*', 'a.artist_name')
             ->paginate(20);
 
-        return view('music.songs', array_merge([
+        return view('dashboard.songs', array_merge([
             'songs' => $songs,
         ], $this->dashboardSharedData()));
     }
@@ -185,7 +185,7 @@ class HomeController extends Controller
             return $song->genre_name ?: 'Khac';
         });
 
-        return view('music.new-releases', array_merge([
+        return view('dashboard.new-releases', array_merge([
             'newest_songs' => $newestSongs,
             'newest_songs_by_genre' => $newestSongsByGenre,
         ], $this->dashboardSharedData()));
@@ -200,7 +200,7 @@ class HomeController extends Controller
             ->limit(100)
             ->get();
 
-        return view('music.leaderboard', array_merge([
+        return view('dashboard.leaderboard', array_merge([
             'leaderboard_songs' => $leaderboardSongs,
         ], $this->dashboardSharedData()));
     }
@@ -247,7 +247,7 @@ class HomeController extends Controller
 
         $albums = $albumsQuery->paginate(20)->withQueryString();
 
-        return view('music.albums', array_merge([
+        return view('dashboard.albums', array_merge([
             'albums' => $albums,
             'selected_album_id' => $albumId,
             'selected_artist_id' => $artistId,
@@ -287,7 +287,7 @@ class HomeController extends Controller
 
         $artists = $artistsQuery->paginate(20)->withQueryString();
 
-        return view('music.artists', array_merge([
+        return view('dashboard.artists', array_merge([
             'artists' => $artists,
             'selected_artist_id' => $artistId,
             'selected_artist' => $selectedArtist,
@@ -322,7 +322,7 @@ class HomeController extends Controller
             }
         }
 
-        return view('music.genres', array_merge([
+        return view('dashboard.genres', array_merge([
             'genres' => $genres,
             'selected_genre_id' => $genreId,
             'selected_genre' => $selectedGenre,
@@ -341,7 +341,7 @@ class HomeController extends Controller
                 ->get();
         }
 
-        return view('music.news', array_merge([
+        return view('dashboard.news', array_merge([
             'news' => $news,
             'selected_news' => null,
         ], $this->dashboardSharedData()));
@@ -365,7 +365,7 @@ class HomeController extends Controller
             abort(404);
         }
 
-        return view('music.news', array_merge([
+        return view('dashboard.news', array_merge([
             'news' => $news,
             'selected_news' => $selectedNews,
         ], $this->dashboardSharedData()));
@@ -387,7 +387,7 @@ class HomeController extends Controller
             ->orderByDesc('f.added_at')
             ->get();
 
-        return view('music.favorites', array_merge([
+        return view('dashboard.favorites', array_merge([
             'favorite_songs' => $favoriteSongs,
         ], $this->dashboardSharedData()));
     }
