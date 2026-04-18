@@ -76,16 +76,22 @@
             color: var(--primary-color) !important;
             margin-right: 22px;
             letter-spacing: -0.02em;
+            white-space: nowrap;
         }
 
         .navbar-nav .nav-link {
             color: #444 !important;
             font-size: 0.98rem;
             font-weight: 600;
-            padding: 10px 16px !important;
+            padding: 10px 14px !important;
             border-radius: 999px;
-            margin: 0 6px;
+            margin: 0 4px;
             transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .navbar-nav .nav-item {
+            flex: 0 0 auto;
         }
 
         .navbar-nav .nav-link:hover {
@@ -151,6 +157,7 @@
             border: 2px solid var(--primary-color);
             text-decoration: none;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .btn-login {

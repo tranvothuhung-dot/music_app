@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SongController;
 use App\Http\Controllers\Admin\AlbumsController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GenresController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UsersController;
@@ -15,11 +16,11 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/dashboard', function () {
-    if (auth()->user()?->role_id === 1) {
+    if ((int) (auth()->user()?->role_id ?? 0) === 1) {
         return redirect()->route('admin.dashboard');
     }
 
-    return view('dashboard');
+    return app(Controller3::class)->index();
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/', [MusicController2::class, 'index']);
 Route::get('/music', [MusicController2::class, 'index'])->name('music.index');
@@ -46,7 +47,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/users', [UsersController::class, 'users'])->name('users.index');
         Route::post('/users', [UsersController::class, 'storeUser'])->name('users.store');
@@ -104,9 +105,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-
-// Đảm bảo route này được bảo vệ bởi middleware 'auth' để chỉ user đã đăng nhập mới vào được
-Route::get('/dashboard', [Controller3::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');

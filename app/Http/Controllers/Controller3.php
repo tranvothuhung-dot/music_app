@@ -5,9 +5,51 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class Controller3 extends Controller
 {
+    private function trackSiteVisit(): void
+    {
+        if (! Schema::hasTable('site_visits')) {
+            return;
+        }
+
+        $today = Carbon::today()->toDateString();
+        $exists = DB::table('site_visits')->where('visit_date', $today)->exists();
+
+        if ($exists) {
+            $updateData = [
+                'visit_count' => DB::raw('visit_count + 1'),
+            ];
+
+            if (Schema::hasColumn('site_visits', 'updated_at')) {
+                $updateData['updated_at'] = now();
+            }
+
+            DB::table('site_visits')
+                ->where('visit_date', $today)
+                ->update($updateData);
+
+            return;
+        }
+
+        $insertData = [
+            'visit_date' => $today,
+            'visit_count' => 1,
+        ];
+
+        if (Schema::hasColumn('site_visits', 'created_at')) {
+            $insertData['created_at'] = now();
+        }
+        if (Schema::hasColumn('site_visits', 'updated_at')) {
+            $insertData['updated_at'] = now();
+        }
+
+        DB::table('site_visits')->insert($insertData);
+    }
+
     public function removeSongFromPlaylist(Request $request)
     {
         $userId = Auth::id();
@@ -200,6 +242,10 @@ class Controller3 extends Controller
             ]);
         }
 
+        DB::table('songs')
+            ->where('song_id', $songId)
+            ->increment('view_count');
+
         return response()->json([
             'saved' => true,
         ]);
@@ -240,6 +286,8 @@ class Controller3 extends Controller
 
     public function index()
     {
+        $this->trackSiteVisit();
+
         // Lấy ID người dùng hiện tại
         $user_id = Auth::id();
 

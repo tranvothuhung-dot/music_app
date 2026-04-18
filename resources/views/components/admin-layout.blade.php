@@ -68,8 +68,27 @@
             text-decoration: none;
         }
 
-        .brand i {
-            font-size: 22px;
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 6px 14px rgba(255, 77, 139, 0.28);
+        }
+
+        .brand-logo::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 9px solid #fff;
+            margin-left: 2px;
         }
 
         .menu-title {
@@ -354,7 +373,7 @@
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <a class="brand" href="{{ Route::has('dashboard') ? route('dashboard') : '#' }}">
-            <i class="fas fa-circle-play"></i>
+            <span class="brand-logo" aria-hidden="true"></span>
             <span>MusicApp</span>
         </a>
 
