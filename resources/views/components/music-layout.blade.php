@@ -1,3 +1,4 @@
+@props(['title'])
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -219,7 +220,7 @@
                                 <div class="dropdown">
                                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
                                         <img src="{{ asset('images/default.png') }}" class="user-avatar me-2" alt="Avatar">
-                                        <span class="fw-bold text-dark d-none d-lg-block text-truncate" style="max-width: 100px;">{{ Auth::user()->name }}</span>
+                                        <span class="fw-bold text-dark d-none d-lg-block text-truncate" style="max-width: 100px;">{{ Auth::user()->full_name ?? Auth::user()->username }}</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-4 overflow-hidden">
                                         <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="fas fa-user-circle me-2 text-secondary"></i>Quản lý</a></li>
