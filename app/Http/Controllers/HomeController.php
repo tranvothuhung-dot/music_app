@@ -92,6 +92,7 @@ class HomeController extends Controller
 
     public function index()
     {
+        $hasArtistStatus = Schema::hasColumn('artists', 'status');
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
@@ -118,13 +119,21 @@ class HomeController extends Controller
             ->get();
 
         $featuredArtists = DB::table('artists')
+            ->when($hasArtistStatus, function ($query) {
+                $query->where('status', 1);
+            })
             ->orderByDesc('created_at')
             ->limit(8)
             ->get();
 
         $news = [];
         if (Schema::hasTable('news')) {
+            $hasNewsStatus = Schema::hasColumn('news', 'status');
+
             $news = DB::table('news')
+                ->when($hasNewsStatus, function ($query) {
+                    $query->where('status', 1);
+                })
                 ->orderByDesc('created_at')
                 ->limit(4)
                 ->get();
@@ -258,6 +267,11 @@ class HomeController extends Controller
 
     public function artists(Request $request)
     {
+        $artists = DB::table('artists')
+            ->when(Schema::hasColumn('artists', 'status'), function ($query) {
+                $query->where('status', 1);
+            })
+            ->paginate(20);
         $artistId = (int) $request->query('artist_id', 0);
 
         $selectedArtist = null;
@@ -336,7 +350,12 @@ class HomeController extends Controller
         $news = [];
 
         if (Schema::hasTable('news')) {
+            $hasNewsStatus = Schema::hasColumn('news', 'status');
+
             $news = DB::table('news')
+                ->when($hasNewsStatus, function ($query) {
+                    $query->where('status', 1);
+                })
                 ->orderByDesc('created_at')
                 ->get();
         }
@@ -412,6 +431,9 @@ class HomeController extends Controller
 
             $artists = DB::table('artists')
                 ->where('artist_name', 'like', $searchTerm)
+                ->when(Schema::hasColumn('artists', 'status'), function ($query) {
+                    $query->where('status', 1);
+                })
                 ->limit(10)
                 ->get();
 
