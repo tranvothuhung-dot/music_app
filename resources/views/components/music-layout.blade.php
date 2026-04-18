@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -830,6 +830,8 @@
         @endif
     </header>
 
+
+    @include('components.login-required-modal')
     <div class="modal fade guest-login-modal" id="playConfirmModal" tabindex="-1" aria-labelledby="playConfirmLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
         <div class="modal-content shadow-lg">
@@ -854,32 +856,7 @@
     </div>
 </div>
 
-    <x-login-required-modal />
-
-    <!-- Play Confirmation Modal -->
-    <div class="modal fade" id="playConfirmModal" tabindex="-1" aria-labelledby="playConfirmLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-            <div class="modal-content rounded-4 border-0 shadow-lg p-3" style="background: #ffffff;">
-                <div class="modal-header border-bottom-0 pb-0 pt-2">
-                    <h5 class="modal-title fw-bold text-danger d-flex align-items-center" id="playConfirmLabel">
-                        <i class="fas fa-lock me-2"></i>Cần đăng nhập
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <div class="mb-3">
-                        <i class="fas fa-headphones fa-4x text-secondary opacity-50"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2 text-dark fs-5">Bạn cần đăng nhập để nghe bài hát</h5>
-                    <p class="text-muted small">Đăng nhập ngay để bắt đầu thưởng thức âm nhạc.</p>
-                </div>
-                <div class="modal-footer border-top-0 justify-content-center pb-2 pt-0 gap-3">
-                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#requireLoginModal" style="min-width: 140px;">Đăng Nhập Ngay</button>
-                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-bs-dismiss="modal" style="min-width: 140px;">Hủy</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <main>
         {{ $slot ?? '' }}
@@ -936,28 +913,57 @@
         </div>
     </footer>
 
-    @if(!auth()->check())
-        @include('components.login-required-modal')
-    @endif
     <script>
-    window.isLogged = {{ auth()->check() ? 'true' : 'false' }};
+        window.isAuthenticated = @json(auth()->check());
+        window.isLogged = !!window.isAuthenticated;
 
-    $(document).ready(function() {
-        
-        $(document).on('click', '.song-bar, .play-btn, .btn-play', function(e) {
-            
-            // Nếu bấm vào nút 3 chấm thả menu thì bỏ qua, cho xem menu bình thường
-            if ($(e.target).closest('.dropdown').length) return;
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.restricted-action').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    if (!window.isAuthenticated) {
+                        event.preventDefault();
+                        var modal = new bootstrap.Modal(document.getElementById('requireLoginModal'));
+                        modal.show();
+                    }
+                });
+            });
 
-            // Nếu là Khách chặn:
-            if (!window.isLogged) {
-                e.preventDefault();      // Chặn chuyển trang
-                e.stopPropagation();     // Chặn kích hoạt các hàm Play khác
-                $('#requireLoginModal').modal('show'); // Bật Modal
-                return false;            // Ngắt hoàn toàn luồng JS
+            document.querySelectorAll('.user-dropdown-toggle').forEach(function (toggle) {
+                toggle.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    var parent = this.closest('.dropdown');
+                    var menu = parent.querySelector('.dropdown-menu');
+                    if (menu) {
+                        menu.classList.toggle('show');
+                        this.setAttribute('aria-expanded', menu.classList.contains('show'));
+                    }
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!event.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+                        menu.classList.remove('show');
+                    });
+                    document.querySelectorAll('.user-dropdown-toggle[aria-expanded="true"]').forEach(function (toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            });
+
+            var modalCloseButton = document.querySelector('#requireLoginModal .btn-close');
+            if (modalCloseButton) {
+                modalCloseButton.addEventListener('click', function () {
+                    var modalEl = document.getElementById('requireLoginModal');
+                    if (modalEl && window.bootstrap && bootstrap.Modal) {
+                        var instance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+                        instance.hide();
+                    }
+                });
             }
-
-    $(document).ready(function() {
+        });
+	
+// LOGIC TÌM KIẾM AJAX (GIỮ NGUYÊN HOẠT ĐỘNG TỐT CỦA MÀY)
         let searchTimeout;
         const dropdown = $('#searchDropdown');
 
@@ -971,7 +977,7 @@
                     if(res.type === 'search') {
                         let html = '';
                         
-                        // Render Nghệ sĩ (Cho click đi thoải mái)
+                        // Render Nghệ sĩ
                         if(res.artists && res.artists.length > 0) {
                             html += `<div style="font-size: 13px; font-weight: bold; color: #888; margin-bottom: 10px; text-transform: uppercase;">Nghệ sĩ</div>`;
                             res.artists.forEach(a => {
@@ -984,7 +990,7 @@
                             });
                         }
 
-                        // Render Bài hát (Gắn class live-song-item để chuẩn bị chặn)
+                        // Render Bài hát
                         if(res.songs && res.songs.length > 0) {
                             html += `<div style="font-size: 13px; font-weight: bold; color: #888; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase;">Bài hát</div>`;
                             res.songs.forEach(s => {
@@ -1004,7 +1010,7 @@
                         dropdown.html(html).fadeIn();
                     }
                 });
-            }, 300); // Đợi 300ms sau khi ngừng gõ mới gọi API cho đỡ lag
+            }, 300);
         });
 
         // Ẩn dropdown khi click ra ngoài
@@ -1012,19 +1018,61 @@
             if (!$(e.target).closest('#searchBoxGlobal').length) dropdown.fadeOut();
         });
 
-        // CHỐT CHẶN: Khi click vào 1 bài hát gợi ý trong Dropdown
-        $(document).on('click', '.live-song-item', function() {
-            dropdown.fadeOut();
-            if(!window.isAuthenticated) {
-                // Khách -> Chặn họng bật Modal
-                var modal = new bootstrap.Modal(document.getElementById('requireLoginModal'));
-                modal.show();
-            } else {
-                // User -> Vào trang nghe nhạc
-                window.location.href = '/music/bai-hat/' + $(this).data('id');
-            }
-        });
+
+        // Chốt chặn cho `.live-song-item` trong dropdown search (dùng data-id)
+        $(document).on('click', '.live-song-item', function(e) {
+        console.log("CLICKED");
+        console.log("isLogged:", window.isLogged);
+        e.preventDefault();
+        e.stopPropagation();
+
+        dropdown.fadeOut();
+
+        if(!window.isLogged) {
+            console.log("SHOW MODAL");
+            showRequireLoginModal();
+        } else {
+            window.location.href = '/music/bai-hat/' + $(this).data('id');
+        }
     });
-</script>
+
+    $(document).on('click', 'a[href^="/music/bai-hat/"]', function(e) {
+    if (!window.isLogged) {
+        e.preventDefault();
+        showRequireLoginModal();
+    }
+});
+
+
+        // Global variable để lưu song ID
+        var currentPlaySongId = null;
+
+        // Hàm đặt song hiện tại
+        function setCurrentSong(songId, songName) {
+            currentPlaySongId = songId;
+            var modal = new bootstrap.Modal(document.getElementById('playConfirmModal'));
+            modal.show();
+        }
+
+        function playSongNow() {
+    if (currentPlaySongId) {
+        window.location.href = '/music/bai-hat/' + currentPlaySongId;
+    }
+}
+
+function showRequireLoginModal() {
+    let modalEl = document.getElementById('requireLoginModal');
+
+    if (!modalEl) {
+        console.error("KHÔNG TÌM THẤY MODAL!");
+        return;
+    }
+
+    let modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+}
+
+        
+    </script>
 </body>
 </html>

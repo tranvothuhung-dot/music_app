@@ -3,8 +3,10 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MusicController2;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Controller3;
 use App\Http\Controllers\Controller5;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', [MusicController2::class, 'index']);
 Route::get('/music', [MusicController2::class, 'index'])->name('music.index');
@@ -49,11 +51,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/playlists/delete', [\App\Http\Controllers\Controller3::class, 'deletePlaylist'])->name('dashboard.playlists.delete');
     Route::post('/dashboard/playlists/add-song', [\App\Http\Controllers\Controller3::class, 'addSongToPlaylist'])->name('dashboard.playlists.addSong');
     Route::post('/dashboard/playlists/remove-song', [\App\Http\Controllers\Controller3::class, 'removeSongFromPlaylist'])->name('dashboard.playlists.removeSong');
+    
 });
 
 require __DIR__.'/auth.php';
 
-use App\Http\Controllers\Controller3;
 
 // Đảm bảo route này được bảo vệ bởi middleware 'auth' để chỉ user đã đăng nhập mới vào được
 Route::get('/dashboard', [Controller3::class, 'index'])
