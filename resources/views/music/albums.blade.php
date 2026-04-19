@@ -50,7 +50,7 @@
                     <div class="card h-100 shadow-sm border-0 album-card">
                         
                         <a href="{{ route('music.album', $albumId) }}">
-                            <img src="{{ asset($albumSource ? 'storage/image/' . $albumSource : 'images/' . $albumDefault) }}" class="card-img-top" alt="{{ $album->album_name }}">
+                            <img src="{{ asset($albumSource ? 'images/' . $albumSource : 'images/' . $albumDefault) }}" class="card-img-top" alt="{{ $album->album_name }}">
                         </a>
                         
                         <div class="card-body">
@@ -71,3 +71,4 @@
         </div>
     </div>
 </x-music-layout>
+

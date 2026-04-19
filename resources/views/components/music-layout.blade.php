@@ -268,6 +268,9 @@
             padding: 0;
             font-size: 1.5rem;
             color: #d1d5db;
+            z-index: 1000;
+            pointer-events: auto;
+            cursor: pointer;
         }
 
         .guest-login-modal .modal-header .btn-close:hover {
@@ -806,11 +809,11 @@
                                 <a href="{{ route('register') }}" class="btn-auth btn-register">Đăng ký</a>
                             @else
                                 @php
-                                    $avatarImage = Auth::user()->avatar_image ?? Auth::user()->avatar_url ?? 'user_7_1767909311.jpg';
+                                    $avatarSrc = Auth::user()->avatar_image_url ?? asset('images/user_7_1767909311.jpg');
                                 @endphp
                                 <div class="dropdown">
                                     <a href="#" class="user-dropdown-toggle d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-                                        <img src="{{ asset('images/' . $avatarImage) }}" onerror="this.src='{{ asset('images/user_7_1767909311.jpg') }}'" class="user-avatar me-2" alt="Avatar">
+                                        <img src="{{ $avatarSrc }}" onerror="this.src='{{ asset('images/user_7_1767909311.jpg') }}'" class="user-avatar me-2" alt="Avatar">
                                         <span class="fw-bold text-dark d-none d-lg-block text-truncate" style="max-width: 100px;">{{ Auth::user()->name }}</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-4 overflow-hidden">
@@ -958,16 +961,19 @@
                 }
             });
 
-            var modalCloseButton = document.querySelector('#requireLoginModal .btn-close');
-            if (modalCloseButton) {
-                modalCloseButton.addEventListener('click', function () {
-                    var modalEl = document.getElementById('requireLoginModal');
-                    if (modalEl && window.bootstrap && bootstrap.Modal) {
-                        var instance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
-                        instance.hide();
+            // Close login modal on X button click
+            document.addEventListener('click', function (event) {
+                if (event.target.classList.contains('btn-close') && event.target.closest('#requireLoginModal')) {
+                    const modalEl = document.getElementById('requireLoginModal');
+                    if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                        const modal = window.bootstrap.Modal.getInstance(modalEl);
+                        if (modal) {
+                            modal.hide();
+                        }
                     }
-                });
-            }
+                }
+            });
+
         });
 	
 // LOGIC TÌM KIẾM AJAX (GIỮ NGUYÊN HOẠT ĐỘNG TỐT CỦA MÀY)

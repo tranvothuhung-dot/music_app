@@ -3,8 +3,8 @@
 @section('content')
     @php
         $displayName = old('full_name', $user->full_name ?: $user->name);
-        $avatarPath = !empty($user->avatar_image)
-            ? asset('images/'.$user->avatar_image)
+        $avatarPath = !empty($user->avatar_image_url)
+            ? $user->avatar_image_url
             : 'https://ui-avatars.com/api/?background=fce7f3&color=be185d&name='.urlencode($displayName ?: 'User');
     @endphp
 
@@ -133,7 +133,7 @@
                 <div class="col-lg-4 col-12 profile-avatar-wrap">
                     <img src="{{ $avatarPath }}" id="profile-avatar-preview" class="profile-avatar" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?background=fce7f3&color=be185d&name=User'">
 
-                    <label for="avatar_image" class="profile-upload-btn">
+                    <label for="avatar_image" class="profile-upload-btn" data-avatar-upload-trigger role="button" tabindex="0">
                         <i class="fas fa-camera"></i>
                         <span>Chọn ảnh</span>
                     </label>
@@ -201,9 +201,24 @@
             const input = document.getElementById('avatar_image');
             const preview = document.getElementById('profile-avatar-preview');
             const form = document.getElementById('profile-edit-form');
+            const trigger = document.querySelector('[data-avatar-upload-trigger]');
 
             if (!input || !preview || !form) {
                 return;
+            }
+
+            if (trigger) {
+                const openFilePicker = function (event) {
+                    event.preventDefault();
+                    input.click();
+                };
+
+                trigger.addEventListener('click', openFilePicker);
+                trigger.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        openFilePicker(event);
+                    }
+                });
             }
 
             input.addEventListener('change', function () {

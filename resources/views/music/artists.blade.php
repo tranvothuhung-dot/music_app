@@ -81,7 +81,7 @@
                         
                         <div class="artist-avatar-box">
                             <a href="{{ route('music.artist', $artistId) }}">
-                                <img src="{{ asset($artistSource ? 'storage/image/' . $artistSource : 'images/' . $artistDefault) }}" alt="{{ $artist->artist_name }}">
+                                <img src="{{ asset($artistSource ? 'images/' . $artistSource : 'images/' . $artistDefault) }}" alt="{{ $artist->artist_name }}">
                             </a>
                         </div>
                         
@@ -104,3 +104,4 @@
         </div>
     </div>
 </x-music-layout>
+

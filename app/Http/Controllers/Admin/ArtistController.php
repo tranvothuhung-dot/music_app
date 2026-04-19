@@ -197,7 +197,7 @@ class ArtistController extends Controller
         }
 
         if (Storage::disk('public')->exists('image/' . $avatar)) {
-            return asset('storage/image/' . $avatar);
+            return asset('images/' . $avatar);
         }
 
         if (file_exists(public_path('images/' . $avatar))) {
@@ -207,3 +207,4 @@ class ArtistController extends Controller
         return asset('images/admin.png');
     }
 }
+

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'full_name',
@@ -42,6 +43,35 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getAvatarImageUrlAttribute(): string
+    {
+        $avatarImage = (string) ($this->avatar_image ?? $this->avatar_url ?? '');
+
+        if ($avatarImage === '') {
+            return '';
+        }
+
+        if (str_starts_with($avatarImage, 'http://') || str_starts_with($avatarImage, 'https://')) {
+            return $avatarImage;
+        }
+
+        $normalizedAvatar = ltrim($avatarImage, '/');
+
+        if (str_starts_with($normalizedAvatar, 'storage/')) {
+            return asset($normalizedAvatar);
+        }
+
+        if (Storage::disk('public')->exists($normalizedAvatar)) {
+            return asset('storage/' . $normalizedAvatar);
+        }
+
+        if (file_exists(public_path($normalizedAvatar))) {
+            return asset($normalizedAvatar);
+        }
+
+        return asset('images/' . basename($normalizedAvatar));
     }
    public function sendPasswordResetNotification($token)
     {

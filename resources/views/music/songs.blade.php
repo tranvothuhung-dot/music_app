@@ -57,7 +57,7 @@
                         @endguest
 
                             <div class="card-img-wrapper">
-                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
+                                <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s1.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
                                 <div class="play-overlay">
                                     <div class="btn-play-circle">
                                         <i class="fas fa-play"></i>
@@ -80,3 +80,4 @@
         </div>
     </div>
 </x-music-layout>
+
