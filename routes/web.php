@@ -34,6 +34,7 @@ Route::get('/music/the-loai/{id}', [MusicController2::class, 'genreDetail'])->na
 Route::get('/music/the-loai', [MusicController2::class, 'genres'])->name('music.genres');
 Route::get('/music/genres', [MusicController2::class, 'genres'])->name('music.genres.alt');
 Route::get('/music/tin-tuc', [MusicController2::class, 'news'])->name('music.news');
+Route::post('/newsletter/subscribe', [HomeController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 
 Route::get('/timkiem', [Controller5::class, 'search'])->name('music.search');
 Route::get('/search/ajax', [Controller5::class, 'ajaxSearch'])->name('search.ajax');

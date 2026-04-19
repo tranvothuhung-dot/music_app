@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -905,9 +905,10 @@
 
                 <div class="col-lg-4 col-md-12 mb-4">
                     <h6 class="footer-heading">Đăng ký nhận tin</h6>
-                    <form class="input-group">
-                        <input type="email" class="form-control bg-light" placeholder="Email của bạn...">
-                        <button class="btn footer-subscribe-btn" type="button"><i class="fas fa-paper-plane"></i></button>
+                    <form class="input-group" id="footer-subscribe-form" action="{{ route('newsletter.subscribe') }}" method="post">
+                        @csrf
+                        <input type="email" name="email" id="footer-subscribe-email" class="form-control bg-light" placeholder="Email của bạn..." required>
+                        <button class="btn footer-subscribe-btn" type="submit" aria-label="Gửi đăng ký"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
@@ -966,6 +967,50 @@
                         var instance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
                         instance.hide();
                     }
+                });
+            }
+
+            var footerSubscribeForm = document.getElementById('footer-subscribe-form');
+            var footerSubscribeEmail = document.getElementById('footer-subscribe-email');
+
+            if (footerSubscribeForm && footerSubscribeEmail) {
+                footerSubscribeForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    var email = String(footerSubscribeEmail.value || '').trim();
+                    var isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                    var tokenInput = footerSubscribeForm.querySelector('input[name="_token"]');
+                    var csrfToken = tokenInput ? tokenInput.value : '';
+
+                    if (!isValidEmail) {
+                        alert('Vui lòng nhập email hợp lệ');
+                        return;
+                    }
+
+                    fetch(footerSubscribeForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({ email: email }),
+                    })
+                        .then(function (response) {
+                            return response.json().then(function (data) {
+                                if (!response.ok) {
+                                    throw new Error(data.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+                                }
+                                return data;
+                            });
+                        })
+                        .then(function (data) {
+                            footerSubscribeEmail.value = '';
+                            alert(data.message || 'Đăng ký nhận tin thành công');
+                        })
+                        .catch(function (error) {
+                            alert(error.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+                        });
                 });
             }
         });

@@ -1551,8 +1551,9 @@
                 </div>
                 <div class="col-lg-4 col-md-6 footer-col">
                     <h6 class="footer-heading">Đăng Ký Nhận Tin</h6>
-                    <form class="footer-subscribe" id="footer-subscribe-form" action="#" method="post">
-                        <input type="email" id="footer-subscribe-email" placeholder="Email của bạn..." aria-label="Email đăng ký">
+                    <form class="footer-subscribe" id="footer-subscribe-form" action="{{ route('newsletter.subscribe') }}" method="post">
+                        @csrf
+                        <input type="email" name="email" id="footer-subscribe-email" placeholder="Email của bạn..." aria-label="Email đăng ký" required>
                         <button type="submit" aria-label="Gửi đăng ký"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
@@ -1622,6 +1623,28 @@
         </div>
     </div>
 </div>
+
+    <div class="modal fade" id="addPlaylistModal" tabindex="-1" aria-labelledby="addPlaylistLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="border-bottom: 1px solid #e5e7eb;">
+                    <h5 class="modal-title" id="addPlaylistLabel">Thêm vào Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="playlist-select" class="form-label">Chọn Playlist:</label>
+                    <select id="playlist-select" class="form-select" style="border-radius: 8px;">
+                        <option value="">-- Chọn playlist --</option>
+                    </select>
+                    <input type="text" id="playlist-new-name" class="form-control mt-3 d-none" placeholder="Nhập tên playlist mới..." style="border-radius: 8px;">
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e5e7eb;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Hủy</button>
+                    <button type="button" id="playlist-save-btn" class="btn btn-primary" style="background-color: #ff4081; border: none; border-radius: 8px; font-weight: bold;">Thêm vào Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <audio id="music-audio" preload="metadata"></audio>
 
@@ -4120,14 +4143,38 @@
 
                     const email = String(footerSubscribeEmail.value || '').trim();
                     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                    const tokenInput = footerSubscribeForm.querySelector('input[name="_token"]');
+                    const csrfToken = tokenInput ? tokenInput.value : '';
 
                     if (!isValidEmail) {
-                        showToast('Vui long nhap email hop le', 'error');
+                        showToast('Vui lòng nhập email hợp lệ', 'error');
                         return;
                     }
 
-                    footerSubscribeEmail.value = '';
-                    showToast('Dang ky nhan tin thanh cong', 'success');
+                    fetch(footerSubscribeForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({ email: email }),
+                    })
+                        .then(function (response) {
+                            return response.json().then(function (data) {
+                                if (!response.ok) {
+                                    throw new Error(data.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+                                }
+                                return data;
+                            });
+                        })
+                        .then(function (data) {
+                            footerSubscribeEmail.value = '';
+                            showToast(data.message || 'Đăng ký nhận tin thành công', 'success');
+                        })
+                        .catch(function (error) {
+                            showToast(error.message || 'Đăng ký thất bại. Vui lòng thử lại.', 'error');
+                        });
                 });
             }
 

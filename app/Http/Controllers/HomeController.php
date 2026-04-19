@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use App\Mail\NewsletterSubscriptionConfirmation;
 
 class HomeController extends Controller
 {
@@ -452,6 +454,59 @@ class HomeController extends Controller
         return view('dashboard.favorites', array_merge([
             'favorite_songs' => $favoriteSongs,
         ], $this->dashboardSharedData()));
+    }
+
+    public function subscribeNewsletter(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = strtolower(trim($data['email']));
+
+        // Kiểm tra email đã tồn tại
+        $subscription = DB::table('newsletter_subscriptions')
+            ->where('email', $email)
+            ->first();
+
+        if ($subscription) {
+            if ($subscription->status === 'unsubscribed') {
+                // Resubscribe nếu trước đó đã bỏ theo dõi
+                DB::table('newsletter_subscriptions')
+                    ->where('email', $email)
+                    ->update([
+                        'status' => 'active',
+                        'unsubscribed_at' => null,
+                        'updated_at' => now(),
+                    ]);
+                
+                Mail::to($email)->send(new NewsletterSubscriptionConfirmation($email));
+
+                return response()->json([
+                    'message' => 'Bạn đã đăng ký nhận tin thành công! Cảm ơn đã quay lại.',
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Email này đã được đăng ký trước đó. Kiểm tra hộp thư của bạn!',
+            ]);
+        }
+
+        // Tạo subscription mới
+        DB::table('newsletter_subscriptions')->insert([
+            'email' => $email,
+            'status' => 'active',
+            'confirmed' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Gửi email xác nhận
+        Mail::to($email)->send(new NewsletterSubscriptionConfirmation($email));
+
+        return response()->json([
+            'message' => 'Đăng ký thành công! 🎉 Vui lòng kiểm tra email của bạn.',
+        ]);
     }
 
     public function search(Request $request)
