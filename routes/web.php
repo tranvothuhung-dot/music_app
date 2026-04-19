@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\MusicController2;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Controller3;
 use App\Http\Controllers\Controller5;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,7 @@ Route::get('/music/tin-tuc', [MusicController2::class, 'news'])->name('music.new
 
 Route::get('/timkiem', [Controller5::class, 'search'])->name('music.search');
 Route::get('/search/ajax', [Controller5::class, 'ajaxSearch'])->name('search.ajax');
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::middleware(['auth', 'admin'])->group(function () {
     // Các route này CHỈ ADMIN mới vào được

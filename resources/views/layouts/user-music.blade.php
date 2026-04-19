@@ -1694,8 +1694,9 @@
                 </div>
                 <div class="col-lg-4 col-md-6 footer-col">
                     <h6 class="footer-heading">Đăng Ký Nhận Tin</h6>
-                    <form class="footer-subscribe" id="footer-subscribe-form" action="#" method="post">
-                        <input type="email" id="footer-subscribe-email" placeholder="Email của bạn..." aria-label="Email đăng ký">
+                    <form class="footer-subscribe" id="footer-subscribe-form" action="{{ route('newsletter.subscribe') }}" method="post">
+                        @csrf
+                        <input type="email" id="footer-subscribe-email" name="email" placeholder="Email của bạn..." aria-label="Email đăng ký" required>
                         <button type="submit" aria-label="Gửi đăng ký"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
@@ -4508,12 +4509,36 @@
                     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
                     if (!isValidEmail) {
-                        showToast('Vui long nhap email hop le', 'error');
+                        showToast('Vui lòng nhập email hợp lệ', 'error');
                         return;
                     }
 
-                    footerSubscribeEmail.value = '';
-                    showToast('Dang ky nhan tin thanh cong', 'success');
+                    const requestBody = new URLSearchParams();
+                    requestBody.append('email', email);
+
+                    fetch('{{ route('newsletter.subscribe') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: requestBody.toString(),
+                    })
+                        .then((response) => response.json().then((data) => {
+                            if (!response.ok) {
+                                throw new Error(data.message || 'Đã xảy ra lỗi khi đăng ký nhận tin');
+                            }
+
+                            return data;
+                        }))
+                        .then((data) => {
+                            footerSubscribeEmail.value = '';
+                            showToast(data.message || 'Đăng ký nhận tin thành công', 'success');
+                        })
+                        .catch((error) => {
+                            showToast(error.message || 'Đã xảy ra lỗi khi đăng ký nhận tin', 'error');
+                        });
                 });
             }
 
