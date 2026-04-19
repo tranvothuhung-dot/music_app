@@ -240,7 +240,7 @@
                         $albumSource = $album->image ?? $album->album_image ?? (isset($album->new_image) ? $album->new_image : null);
                         $firstSongId = $songs->count() > 0 ? ($songs->first()->song_id ?? $songs->first()->id ?? null) : null;
                     @endphp
-                    <img src="{{ asset($albumSource ? 'storage/image/' . $albumSource : 'images/' . $albumDefault) }}" class="album-cover-circle" alt="{{ $album->album_name }}">
+                    <img src="{{ asset($albumSource ? 'images/' . $albumSource : 'images/' . $albumDefault) }}" class="album-cover-circle" alt="{{ $album->album_name }}">
                     <h1 class="album-title">{{ $album->album_name }}</h1>
                     <div class="album-artist">{{ $album->artist_name }}</div>
                     <div class="album-count">{{ count($songs) }} bài hát</div>
@@ -282,7 +282,7 @@
                             <div class="song-num">{{ $idx + 1 }}</div>
                             
                             <div class="song-cover-wrapper">
-                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
+                                <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
                                 <div class="song-play-overlay">
                                     <div class="song-play-icon">
                                         <i class="fas fa-play"></i>

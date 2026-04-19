@@ -136,7 +136,7 @@
                     @php
                         $songImage = $song->image ?? $song->song_image ?? (isset($song->new_image) ? $song->new_image : null);
                     @endphp
-                    <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}">
+                    <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}">
                 </div>
                 
                 <div class="song-detail-body text-center">

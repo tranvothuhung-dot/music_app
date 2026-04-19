@@ -19,7 +19,7 @@
                             @endphp
                             
                             <div class="card-img-wrapper">
-                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
+                                <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s1.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
                                 <div class="play-overlay">
                                     @guest
                                         <button class="btn-play-circle text-decoration-none" data-bs-toggle="modal" data-bs-target="#playConfirmModal" onclick="setCurrentSong({{ $songId }}, '{{ $song->song_name }}')">
@@ -62,7 +62,7 @@
                             @endphp
                             
                             <div class="card-img-wrapper">
-                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s2.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
+                                <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s2.png') }}" class="card-img-top" alt="{{ $song->song_name }}">
                                 @if(!empty($song->genre_name))
                                     <span class="genre-badge">{{ $song->genre_name }}</span>
                                 @endif
@@ -111,7 +111,7 @@
                                 $albumDetailUrl = $albumId ? route('music.album', $albumId) : route('music.albums');
                             @endphp
                             <div class="card-img-wrapper">
-                                <img src="{{ asset($albumSource ? 'storage/image/' . $albumSource : 'images/' . $albumDefault) }}" class="card-img-top" alt="{{ $album->album_name }}">
+                                <img src="{{ asset($albumSource ? 'images/' . $albumSource : 'images/' . $albumDefault) }}" class="card-img-top" alt="{{ $album->album_name }}">
                                 <div class="play-overlay">
                                     <a href="{{ $albumDetailUrl }}" class="btn-xem-album">Xem Album</a>
                                 </div>
@@ -147,7 +147,7 @@
                     <div class="col-md-3 mb-4">
                         <a href="{{ route('music.artist', ['id' => $artistId]) }}" class="artist-item text-center">
                             <div class="artist-avatar-box">
-                                <img src="{{ asset($artistSource ? 'storage/image/' . $artistSource : 'images/' . $artistDefault) }}" alt="{{ $artist->artist_name }}">
+                                <img src="{{ asset($artistSource ? 'images/' . $artistSource : 'images/' . $artistDefault) }}" alt="{{ $artist->artist_name }}">
                             </div>
                             <h5 class="card-title text-dark fw-bold mb-0">{{ $artist->artist_name }}</h5>
                         </a>
@@ -174,7 +174,7 @@
                             @endphp
                             
                             <div class="news-img-wrapper">
-                                <img src="{{ asset($newsImage ? 'storage/image/' . $newsImage : 'images/n1.jpg') }}" alt="{{ $item->title ?? 'Tin tức' }}">
+                                <img src="{{ asset($newsImage ? 'images/' . $newsImage : 'images/n1.jpg') }}" alt="{{ $item->title ?? 'Tin tức' }}">
                             </div>
                             
                             <div class="news-content">

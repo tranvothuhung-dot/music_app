@@ -287,7 +287,7 @@
                             <div class="song-num">{{ $idx + 1 }}</div>
                             
                             <div class="song-cover-wrapper">
-                                <img src="{{ asset($songImage ? 'storage/image/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
+                                <img src="{{ asset($songImage ? 'images/' . $songImage : 'images/s1.png') }}" alt="{{ $song->song_name }}" class="song-cover-sm">
                                 <div class="song-play-overlay">
                                     <div class="song-play-icon">
                                         <i class="fas fa-play"></i>

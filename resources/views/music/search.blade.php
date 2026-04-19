@@ -30,6 +30,28 @@
     .btn-more { background: #f8f9fa; border: none; color: #aaa; width: 36px; height: 36px; border-radius: 10px; transition: 0.2s; }
     .btn-more:hover { background: #ff4081; color: #fff; }
 
+    .song-bar .dropdown-menu {
+        min-width: 248px;
+        padding: 8px;
+        border-radius: 18px;
+    }
+
+    .song-bar .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 400;
+        line-height: 1.2;
+    }
+
+    .song-bar .dropdown-item i {
+        width: 18px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
     .result-section { display: flex; flex-direction: column; }
     .section-header { font-weight: 800; color: #333; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
     .section-header::before { content: ''; width: 4px; height: 20px; background: #ff4081; border-radius: 10px; }
@@ -67,7 +89,7 @@
                     <div class="row g-4">
                         @foreach($artists as $artist)
                             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                                <a href="{{ route('dashboard.artists') }}?artist_id={{ $artist->artist_id }}" class="text-decoration-none text-center d-block custom-card p-3 bg-white" style="border-radius: 20px;">
+                                <a href="{{ route('dashboard.artists') }}?artist_id={{ $artist->artist_id }}" class="text-decoration-none text-center d-block custom-card p-3 bg-white" style="border-radius: 20px;" data-artist-link>
                                     <div class="position-relative d-inline-block mb-3">
                                         <img src="{{ asset('images/'.$artist->avatar_image) }}" class="rounded-circle shadow-sm object-fit-cover" style="width: 110px; height: 110px; border: 4px solid #fff;">
                                         <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 30px; height: 30px; border: 2px solid #fff;">
@@ -116,9 +138,39 @@
                                     <button class="btn-more" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-ellipsis-h"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" style="border-radius: 12px; min-width: 230px;">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" style="border-radius: 18px; min-width: 248px;">
                                         <li>
-                                            <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" 
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="play" data-song-id="{{ $song->song_id }}">
+                                                <i class="fas fa-play me-2 text-primary"></i> Phát ngay
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="like" data-song-id="{{ $song->song_id }}">
+                                                <i class="fas fa-heart me-2 text-danger"></i> Thêm vào yêu thích
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="queue" data-song-id="{{ $song->song_id }}">
+                                                <i class="fas fa-list-ul me-2 text-secondary"></i> Thêm vào hàng đợi
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="playlist" data-song-id="{{ $song->song_id }}">
+                                                <i class="fas fa-plus-square me-2 text-secondary"></i> Thêm vào Playlist
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="album" data-song-id="{{ $song->song_id }}" data-album-id="{{ $song->album_id ?? '' }}">
+                                                <i class="fas fa-record-vinyl me-2 text-secondary"></i> Đi tới album
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" data-action="artist" data-song-id="{{ $song->song_id }}" data-artist-id="{{ $song->artist_id }}">
+                                                <i class="fas fa-user me-2 text-secondary"></i> Đi tới ca sĩ
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item rounded-3 py-2" type="button" 
                                             data-action="share" 
                                             data-song-id="{{ $song->song_id }}" 
                                             data-song-name="{{ e($song->song_name) }}" 
@@ -127,49 +179,11 @@
                                             </button>
                                         </li>
                                         <li>
-                                            <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" 
+                                            <button class="dropdown-item rounded-3 py-2" type="button" 
                                             onclick="handleCopyLink('{{ url('/music?song_id='.$song->song_id) }}')">
                                                 <i class="fas fa-link me-2 text-primary"></i> Sao chép liên kết
                                             </button>
                                         </li>
-                                        <li><hr class="dropdown-divider opacity-50"></li>
-                                        
-                                        @auth
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" 
-                                                data-action="like" data-song-id="{{ $song->song_id }}">
-                                                    <i class="far fa-heart me-2 text-danger"></i> Thêm vào yêu thích
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" 
-                                                data-action="playlist" data-song-id="{{ $song->song_id }}">
-                                                    <i class="fas fa-plus-circle me-2 text-success"></i> Thêm vào Playlist
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" 
-                                                data-action="queue" data-song-id="{{ $song->song_id }}">
-                                                    <i class="fas fa-list-ul me-2 text-info"></i> Thêm vào hàng đợi
-                                                </button>
-                                            </li>
-                                        @else
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" onclick="showLoginModal()">
-                                                    <i class="far fa-heart me-2 text-muted"></i> Thêm vào yêu thích
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" onclick="showLoginModal()">
-                                                    <i class="fas fa-plus-circle me-2 text-muted"></i> Thêm vào Playlist
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item rounded-3 py-2 fw-bold" type="button" onclick="showLoginModal()">
-                                                    <i class="fas fa-list-ul me-2 text-muted"></i> Thêm vào hàng đợi
-                                                </button>
-                                            </li>
-                                        @endauth
                                     </ul>
                                 </div>
                             </div>
@@ -185,7 +199,7 @@
                     <div class="row g-4">
                         @foreach($albums as $album)
                             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                                <a href="{{ route('dashboard.albums') }}?album_id={{ $album->album_id }}" class="text-decoration-none d-block custom-card p-2 bg-white" style="border-radius: 18px;">
+                                <a href="{{ route('dashboard.albums') }}?album_id={{ $album->album_id }}" class="text-decoration-none d-block custom-card p-2 bg-white" style="border-radius: 18px;" data-album-link>
                                     <div class="overflow-hidden mb-2 shadow-sm" style="border-radius: 14px;">
                                         <img src="{{ asset('images/'.$album->cover_image) }}" class="w-100 object-fit-cover transition" style="aspect-ratio: 1/1;">
                                     </div>

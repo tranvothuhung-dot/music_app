@@ -145,7 +145,7 @@
                     <div class="news-card">
                         
                         <div class="news-card-img-wrap">
-                            <img src="{{ asset($newsImage ? 'storage/image/' . $newsImage : 'images/n1.jpg') }}" alt="{{ $item->title ?? 'Tin tức' }}">
+                            <img src="{{ asset($newsImage ? 'images/' . $newsImage : 'images/n1.jpg') }}" alt="{{ $item->title ?? 'Tin tức' }}">
                         </div>
 
                         <div class="card-body">
@@ -182,3 +182,4 @@
         </div>
     </div>
 </x-music-layout>
+
